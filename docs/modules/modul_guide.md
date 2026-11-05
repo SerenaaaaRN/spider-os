@@ -1,6 +1,6 @@
 # 🕷️ SpiderOS: Modul End-to-End Remastering Debian 13 Trixie dengan live-build
 
-Modul praktik lengkap dari nol sampai ISO jadi, diuji di USB asli, dan siap dilaporkan. Tema: Spider-Man. Basis: **Debian 13 (trixie)**. Tool utama: **live-build**. Desktop: **XFCE 4.20**. Tool bonus: **Rust (Spider-Sense)**.
+Modul praktik lengkap dari nol sampai ISO jadi, diuji di USB asli, dan siap dilaporkan. Tema: Spider-Man. Basis: **Debian 13 (trixie)**. Tool utama: **live-build**. Desktop: **XFCE 4.20**. Komponen koding inti: **Rust (Spider-Sense)**.
 
 ---
 
@@ -11,8 +11,10 @@ Modul praktik lengkap dari nol sampai ISO jadi, diuji di USB asli, dan siap dila
 - Tampilan bertema Spider-Man: wallpaper, tema GTK, ikon, login screen, boot menu, animasi boot (Plymouth), terminal.
 - Branding sistem: `neofetch`, prompt bash, `/etc/os-release`.
 - Aplikasi dasar yang ringan dan berguna.
-- **(Bonus)** tool Spider-Sense (**Rust**) yang membaca `/proc`.
+- **Komponen inti koding**: tool Spider-Sense (**Rust**) yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka terminal dengan ANSI.
 - Dokumentasi lengkap yang langsung jadi bahan BAB III, IV, dan V.
+
+> **Basis sistem.** Modul ini menggunakan **Debian 13 (trixie)**. Seluruh contoh `lb config`, paket, dan hook mengacu pada trixie. Jika menemukan referensi Debian 12 pada materi lama, ganti dengan `trixie` dan jalankan pemeriksaan konsistensi di Phase 2.3.
 
 ### 0.2 Konvensi di modul ini
 
@@ -39,7 +41,7 @@ Folder kerja: `~/spideros`. Semua perintah dijalankan dari situ kecuali disebut 
 | 6 | Tema desktop (wallpaper, GTK, ikon, login screen) | Construction | 3–5 jam |
 | 7 | Branding boot (boot menu, Plymouth) | Construction | 3–4 jam |
 | 8 | Branding terminal dan sistem | Construction | 2–3 jam |
-| 9 | Spider-Sense (Rust, bonus) | Construction | 3–6 jam |
+| 9 | Spider-Sense (Rust, komponen inti koding) | Construction | 8–12 jam |
 | 10 | Build ISO v1 dan uji menyeluruh di VM | Construction | 2–3 jam |
 | 11 | Flash USB dan uji hardware (UEFI dan Legacy) | Transition | 3–5 jam |
 | 12 | Perbaikan bug, ISO v2, freeze | Transition | 2–4 jam |
@@ -51,12 +53,12 @@ Phase 4 bisa jalan paralel dengan Phase 2 dan 3 (desainer tidak perlu menunggu b
 
 | Peran | Tanggung jawab utama | Phase utama |
 |---|---|---|
-| Builder | Pipeline live-build, hook, konfigurasi, build ISO | 1, 2, 5, 6, 7, 8, 10, 12 |
+| Builder | Pipeline live-build, hook, konfigurasi, build ISO, integrasi kompilasi Rust di chroot | 1, 2, 5, 6, 7, 8, 9, 10, 12 |
 | Desainer | Semua aset visual | 4 (lalu bantu 6, 7) |
-| Tester | VM test, USB, matriks hardware, catat boot sequence | 3, 10, 11 |
-| Dokumentator | Catatan, screenshot, laporan, panduan, demo (dan Spider-Sense kalau sempat) | 1, 9, 13 |
+| Tester | VM test, USB, matriks hardware, catat boot sequence, verifikasi binary Spider-Sense | 3, 9, 10, 11 |
+| Dokumentator | Catatan, screenshot, laporan, panduan, demo, dokumentasi arsitektur dan pengujian kode Rust | 1, 9, 13 |
 
-Semua anggota tetap mencoba menjalankan ISO minimal sekali supaya bisa menjawab pertanyaan dosen.
+Phase 9 dikerjakan secara kolaboratif: Builder menyiapkan hook kompilasi, satu anggota menjadi penanggung jawab utama kode Rust, Tester memverifikasi binary di ISO, dan Dokumentator mencatat keputusan desain serta hasil pengujian. Semua anggota tetap mencoba menjalankan ISO minimal sekali supaya bisa menjawab pertanyaan dosen.
 
 ### 0.5 Aturan emas
 - Snapshot VM sebelum setiap phase besar.
@@ -263,6 +265,8 @@ dist/*
 !dist/.gitkeep
 # Rust
 tools/spider-sense/target/
+# staging sumber Rust untuk hook chroot
+config/includes.chroot_after_packages/opt/spider-sense-src/
 EOF
 touch dist/.gitkeep
 ```
@@ -284,6 +288,8 @@ spideros/
 ├── dist/                      # ISO hasil build
 └── docs/                      # catatan dan screenshot
 ```
+
+`tools/spider-sense/` adalah rumah proyek Rust: seluruh source, `Cargo.toml`, `Cargo.lock`, dan unit test berada di sana. Folder `config/` hanya menerima salinan sementara saat build melalui skrip staging.
 
 Commit pertama:
 
@@ -314,14 +320,14 @@ Buat juga `docs/credits.md` untuk mencatat sumber setiap aset (lisensi dan atrib
 
 ### 1.8 Checklist Phase 1
 
-- [ ] VM jalan, RAM 4 GB atau lebih, disk bebas > 25 GB
-- [ ] `sudo` berfungsi
-- [ ] Semua tools terpasang, `lb --version` keluar, `cargo --version` keluar
-- [ ] Jam VM sinkron
-- [ ] Cara memindahkan file VM ke Windows sudah diuji (coba salin file kecil)
-- [ ] Repo Git ada dan ada 1 commit
-- [ ] Template catatan siap, peran 4 orang sudah dibagi
-- [ ] Snapshot `P1-clean-start` ada
+- [x] VM jalan, RAM 4 GB atau lebih, disk bebas > 25 GB
+- [x] `sudo` berfungsi
+- [x] Semua tools terpasang, `lb --version` keluar, `cargo --version` keluar
+- [x] Jam VM sinkron
+- [x] Cara memindahkan file VM ke Windows sudah diuji (coba salin file kecil)
+- [x] Repo Git ada dan ada 1 commit
+- [x] Template catatan siap, peran 4 orang sudah dibagi
+- [x] Snapshot `P1-clean-start` ada
 
 ✅ **Selesai kalau:** semua kotak di atas tercentang.
 
@@ -414,6 +420,14 @@ Arti opsi penting (catat untuk BAB III):
 | `splash` | Mengaktifkan animasi boot Plymouth nanti |
 
 Login default live: user `spider`, password `live`.
+
+Sebelum build, pastikan tidak ada sisa referensi Debian 12 dan seluruh konfigurasi memakai trixie:
+
+```bash
+grep -RniE "debian[ -]12" auto config scripts tools docs || echo "OK: tidak ada referensi Debian 12"
+grep -n -- "--distribution" auto/config
+# Output yang diharapkan: --distribution trixie
+```
 
 ### 2.4 Daftar paket baseline
 
@@ -537,6 +551,7 @@ Snapshot: `P2-baseline-built`. Salin ISO ke Windows (lihat 1.5).
 ### 2.11 Checklist Phase 2
 
 - [ ] `auto/config`, paket list, `lb config` sukses
+- [ ] `auto/config` memakai `--distribution trixie` dan tidak ada referensi Debian 12
 - [ ] `sudo lb build` selesai tanpa error fatal
 - [ ] ISO ada, `file` menunjukkan hybrid, El Torito menunjukkan BIOS dan UEFI
 - [ ] `build.log` tersimpan, screenshot diambil
@@ -807,7 +822,7 @@ EOF
 
 **Catatan Trixie:**
 - Daftar ini sengaja eksplisit (tanpa `task-xfce-desktop`) karena task Debian menarik paket besar seperti LibreOffice. Dengan begini sistem lebih ringan, sesuai klaim di proposal.
-- Meta-package `firmware-linux` di Trixie sudah mencakup banyak driver yang di Bookworm harus dipasang manual. Ini bikin ISO lebih kompatibel *out-of-the-box*.
+- Meta-package `firmware-linux` di Trixie sudah mencakup banyak driver yang sebelumnya harus dipasang manual. Ini membuat ISO lebih kompatibel *out-of-the-box*.
 - Driver NVIDIA proprietary tidak dimasukkan (pakai driver bawaan `nouveau`). Ini bagus untuk kompatibilitas, tulis di laporan sebagai batasan.
 
 ### 5.2 Mencari paket yang berat (opsional)
@@ -1475,28 +1490,75 @@ Snapshot: `P8-terminal-branding`.
 
 ---
 
-## PHASE 9: Spider-Sense (Coding Bonus — Rust)
+## PHASE 9: System Programming dalam Rust — Spider-Sense (Komponen Inti)
 
-**Tujuan:** membuat tool CLI kecil bertema Spider-Man yang membaca `/proc`, ditulis dalam **Rust**, lalu memasukkannya ke ISO.
-**Status:** bonus. Kalau Phase 1–8 belum aman, lewati dan kembali ke sini kalau ada waktu.
+**Tujuan:** membangun tool CLI bertema Spider-Man yang membaca `/proc` secara langsung, mem-parsing data kernel secara manual, dan merender informasi sistem secara real-time dengan ANSI, lalu mengompilasinya di dalam chroot saat proses build ISO.
+**Status:** inti (wajib). Phase ini adalah komponen teknis utama dan tidak boleh dilewati.
 
-### 9.1 Spesifikasi
+### 9.1 Spesifikasi dan batasan teknis
 
 Spider-Sense menampilkan kondisi sistem dengan gaya Spider-Man:
 
 | Info | Sumber di `/proc` | Konsep SO |
 |---|---|---|
 | Model CPU | `/proc/cpuinfo` | Informasi hardware |
-| Penggunaan CPU (%) | `/proc/stat` (selisih dua pengambilan sampel) | Penjadwalan CPU, waktu user/system/idle |
+| Penggunaan CPU (%) | `/proc/stat` (selisih dua sampel) | Penjadwalan CPU, waktu user/system/idle |
 | RAM total dan tersedia | `/proc/meminfo` | Manajemen memori (`MemAvailable`) |
 | Jumlah proses | folder angka di `/proc` | Manajemen proses (satu folder per PID) |
 | Uptime | `/proc/uptime` | Waktu sistem berjalan |
 | Beban rata-rata | `/proc/loadavg` | Antrian proses (load) |
-| Level "bahaya" | dihitung dari CPU dan RAM | Logika sederhana |
+| Versi kernel | `/proc/sys/kernel/osrelease` | Identitas kernel |
+| Level "bahaya" | dihitung dari CPU dan RAM | Logika ambang batas |
 
 Level bahaya: di bawah 40% = "Tenang", 40–75% = "Waspada", di atas 75% = "BAHAYA! Spider-Sense berdenyut!".
 
-### 9.2 Setup proyek Rust di build-VM
+Batasan teknis yang menjadi inti kompetensi koding:
+
+- **Hanya memakai standard library Rust (`std`)**. Tidak ada crate eksternal seperti `sysinfo`, `crossterm`, `ratatui`, atau `ncurses`.
+- **Tidak memanggil program lain** seperti `top`, `free`, atau `ps`. Semua data dibaca langsung dari `/proc`.
+- **Parsing manual**: setiap baris `/proc/stat`, `/proc/meminfo`, `/proc/cpuinfo`, `/proc/uptime`, dan `/proc/loadavg` dipecah serta dikonversi sendiri.
+- **Rendering ANSI manual**: kursor, pembersihan layar, warna, dan progress bar dibentuk dari escape sequence, bukan library TUI.
+- **Mode real-time**: program mengambil sampel berulang, menghitung delta CPU dari sampel sebelumnya, lalu menggambar ulang layar setiap detik.
+
+Penjelasan field `/proc/stat` yang dipakai:
+
+| Field | Arti |
+|---|---|
+| `user` | Waktu CPU untuk proses user |
+| `nice` | Waktu CPU untuk proses user dengan prioritas nice |
+| `system` | Waktu CPU untuk proses kernel |
+| `idle` | Waktu CPU idle |
+| `iowait` | Waktu menunggu I/O |
+| `irq`, `softirq` | Waktu menangani interrupt |
+| `steal` | Waktu CPU yang diambil hypervisor (relevan di VM) |
+
+Rumus yang dipakai: `idle = idle + iowait`, `total = jumlah delapan field pertama`, lalu `cpu% = 100 × (1 − Δidle/Δtotal)`.
+
+Untuk memori, program membaca `MemTotal` dan `MemAvailable` dari `/proc/meminfo`, lalu menghitung `used = MemTotal − MemAvailable`. `MemAvailable` dipilih karena memperhitungkan cache yang dapat dilepas, bukan hanya `MemFree`.
+
+### 9.2 Arsitektur proyek dan posisi `tools/`
+
+Proyek Rust disimpan di `tools/spider-sense/` dan menjadi sumber kebenaran (canonical source). Folder ini tidak hanya berisi binary, tetapi proyek Cargo lengkap:
+
+```
+tools/spider-sense/
+├── Cargo.toml          # metadata, profile release, tanpa dependencies
+├── Cargo.lock          # dikunci untuk build reproducible
+└── src/
+    └── main.rs         # CLI, parser /proc, sampler CPU, renderer ANSI, unit test
+```
+
+Struktur `main.rs` dibagi menjadi lima bagian agar mudah dijelaskan di laporan:
+
+1. **CLI** — `--once`, `--watch`, `--no-color`, `--help`, `--version`.
+2. **Parser `/proc`** — fungsi murni yang menerima teks dan mengembalikan struktur data.
+3. **Sampler CPU** — menyimpan sampel sebelumnya dan menghitung delta.
+4. **Renderer ANSI** — menyusun frame, progress bar, dan warna.
+5. **Unit test** — menguji parser, perhitungan persentase, bar, dan format uptime.
+
+Saat build, sumber disalin sementara ke `config/includes.chroot_after_packages/opt/spider-sense-src/` agar dapat diakses hook di dalam chroot. Direktori staging ini bersifat generated dan tidak di-commit; sumber asli tetap di `tools/spider-sense/`.
+
+### 9.3 Setup proyek Rust di build-VM
 
 Pastikan Rust sudah terpasang (Phase 1.4):
 
@@ -1505,7 +1567,7 @@ cargo --version
 rustc --version
 ```
 
-Buat proyek baru:
+Buat proyek:
 
 ```bash
 cd ~/spideros/tools
@@ -1513,243 +1575,163 @@ cargo new spider-sense
 cd spider-sense
 ```
 
-### 9.3 Kode Spider-Sense (Rust)
+Atur `Cargo.toml` dengan ketentuan berikut (tanpa menambah dependency):
 
-Ganti isi `src/main.rs`:
+| Bagian | Nilai |
+|---|---|
+| `name` | `spider-sense` |
+| `version` | `1.0.0` |
+| `edition` | `2021` |
+| `[dependencies]` | kosong |
+| `[profile.release]` | `opt-level = "z"`, `lto = true`, `codegen-units = 1`, `strip = true` |
 
-```bash
-cat > src/main.rs <<'EOF'
-use std::fs;
-use std::thread::sleep;
-use std::time::Duration;
+Profile release dipakai agar binary kecil dan cepat. Setelah build pertama, `Cargo.lock` terbentuk; commit file tersebut agar hook dapat memakai `--locked`.
 
-const RED: &str = "\x1b[1;31m";
-const BLUE: &str = "\x1b[1;34m";
-const WHITE: &str = "\x1b[1;37m";
-const YELLOW: &str = "\x1b[1;33m";
-const RESET: &str = "\x1b[0m";
+### 9.4 Panduan implementasi Spider-Sense
 
-fn cpu_times() -> Option<(u64, u64)> {
-    let s = fs::read_to_string("/proc/stat").ok()?;
-    let line = s.lines().next()?;
-    let v: Vec<u64> = line
-        .split_whitespace()
-        .skip(1)
-        .filter_map(|x| x.parse().ok())
-        .collect();
-    if v.len() < 5 {
-        return None;
-    }
-    let idle = v[3] + v[4];
-    let total: u64 = v.iter().take(8).sum();
-    Some((idle, total))
-}
+Tidak ada kode program yang disediakan di modul ini. Implementasi ditulis sendiri di `src/main.rs` dengan mengikuti spesifikasi berikut.
 
-fn cpu_usage() -> f64 {
-    let (i1, t1) = match cpu_times() {
-        Some(x) => x,
-        None => return 0.0,
-    };
-    sleep(Duration::from_millis(400));
-    let (i2, t2) = match cpu_times() {
-        Some(x) => x,
-        None => return 0.0,
-    };
-    let dt = (t2 - t1) as f64;
-    let di = (i2 - i1) as f64;
-    if dt <= 0.0 { 0.0 } else { 100.0 * (1.0 - di / dt) }
-}
+**Struktur yang disarankan** (boleh satu file, boleh dipecah menjadi modul):
 
-fn mem_kb(key: &str) -> u64 {
-    fs::read_to_string("/proc/meminfo")
-        .unwrap_or_default()
-        .lines()
-        .find(|l| l.starts_with(key))
-        .and_then(|l| l.split_whitespace().nth(1))
-        .and_then(|n| n.parse().ok())
-        .unwrap_or(0)
-}
+| Bagian | Tanggung jawab |
+|---|---|
+| CLI | Membaca `--once`, `--watch`, `--no-color`, `--help`, `--version`; default `--watch`. |
+| Parser `/proc` | Fungsi yang menerima teks dan mengembalikan data; tidak membaca file langsung agar mudah diuji. |
+| Sampler CPU | Menyimpan sampel `idle` dan `total` sebelumnya, lalu menghitung delta. |
+| Collector | Membaca `/proc/stat`, `/proc/meminfo`, `/proc/cpuinfo`, `/proc/uptime`, `/proc/loadavg`, `/proc/sys/kernel/osrelease`, dan menghitung jumlah folder PID di `/proc`. |
+| Renderer ANSI | Menyusun frame, progress bar, warna, dan pembersihan layar dengan escape sequence. |
+| Unit test | Menguji parser, perhitungan persentase memori, batas progress bar, dan format uptime. |
 
-fn cpu_model() -> String {
-    fs::read_to_string("/proc/cpuinfo")
-        .unwrap_or_default()
-        .lines()
-        .find(|l| l.starts_with("model name"))
-        .and_then(|l| l.split(':').nth(1))
-        .map(|s| s.trim().to_string())
-        .unwrap_or_else(|| "tidak diketahui".to_string())
-}
+**Ketentuan implementasi:**
 
-fn process_count() -> usize {
-    fs::read_dir("/proc")
-        .map(|d| {
-            d.filter_map(|e| e.ok())
-                .filter(|e| {
-                    let n = e.file_name().to_string_lossy().to_string();
-                    !n.is_empty() && n.chars().all(|c| c.is_ascii_digit())
-                })
-                .count()
-        })
-        .unwrap_or(0)
-}
+1. Gunakan hanya `std`. Jangan menambah crate eksternal.
+2. Jangan memanggil `top`, `free`, `ps`, atau program lain; baca `/proc` langsung.
+3. `parse_cpu_line` membaca baris pertama `/proc/stat`, mengambil delapan field pertama, menghitung `idle = idle + iowait` dan `total = jumlah delapan field`, lalu mengembalikan `(idle, total)`.
+4. Penggunaan CPU dihitung dari dua sampel: `100 × (1 − Δidle/Δtotal)`.
+5. `parse_meminfo` mengambil `MemTotal` dan `MemAvailable`; persentase memori memakai `(MemTotal − MemAvailable) / MemTotal × 100`.
+6. Jumlah proses dihitung dari entri `/proc` yang namanya hanya angka.
+7. Mode `--watch` mengambil sampel setiap 1 detik, membersihkan layar dengan ANSI (`ESC[2J` dan `ESC[H`), lalu menggambar ulang.
+8. Mode `--once` mencetak satu frame lalu keluar; mode ini dipakai untuk smoke test build.
+9. `--no-color` mematikan warna, tetapi tidak mematikan pembersihan layar pada mode watch.
+10. Sediakan minimal 5 unit test untuk parser dan fungsi bantu.
 
-fn uptime_text() -> String {
-    let sec: f64 = fs::read_to_string("/proc/uptime")
-        .unwrap_or_default()
-        .split_whitespace()
-        .next()
-        .and_then(|x| x.parse().ok())
-        .unwrap_or(0.0);
-    let s = sec as u64;
-    let d = s / 86400;
-    let h = (s % 86400) / 3600;
-    let m = (s % 3600) / 60;
-    if d > 0 {
-        format!("{} hari {} jam {} menit", d, h, m)
-    } else {
-        format!("{} jam {} menit", h, m)
-    }
-}
+**Alur program yang diharapkan:**
 
-fn load_avg() -> String {
-    let s = fs::read_to_string("/proc/loadavg").unwrap_or_default();
-    let parts: Vec<&str> = s.split_whitespace().take(3).collect();
-    parts.join(" ")
-}
+1. Parsing argumen.
+2. Inisialisasi sampler.
+3. Jika `--once`: ambil sampel awal, tunggu sekitar 300 ms, ambil sampel kedua, render satu frame, keluar.
+4. Jika `--watch`: ambil sampel awal, lalu loop: tunggu 1 detik, ambil sampel, render, flush stdout.
+5. Tampilkan CPU, RAM, model CPU, kernel, uptime, jumlah proses, load average, dan status berdasarkan nilai tertinggi CPU/RAM.
 
-fn bar(pct: f64, width: usize) -> String {
-    let filled = ((pct / 100.0 * width as f64).round() as usize).min(width);
-    format!("{}{}", "#".repeat(filled), "-".repeat(width - filled))
-}
-
-fn main() {
-    let cpu = cpu_usage();
-    let total = mem_kb("MemTotal:");
-    let avail = mem_kb("MemAvailable:");
-    let mem_pct = if total > 0 {
-        100.0 * (1.0 - avail as f64 / total as f64)
-    } else {
-        0.0
-    };
-    let procs = process_count();
-    let load = load_avg();
-
-    println!(
-        "{RED}   \\  \\     /  /{RESET}"
-    );
-    println!(
-        "{RED}    \\  \\   /  /{RESET}      {WHITE}S P I D E R - S E N S E{RESET}"
-    );
-    println!(
-        "{RED} ____\\  \\_/  /____{RESET}   ------------------------"
-    );
-    println!(
-        "{RED} \\     \\ (O) /    /{RESET}"
-    );
-    println!(
-        "{RED}  `-.__/ / \\ \\__.-'{RESET}\n"
-    );
-
-    println!("{WHITE}Kernel  : {RESET}{}", std::env::consts::OS);
-    println!("{WHITE}CPU     : {RESET}{}", cpu_model());
-    println!("{WHITE}Uptime  : {RESET}{}", uptime_text());
-    println!("{WHITE}Proses  : {RESET}{}", procs);
-    println!("{WHITE}Load    : {RESET}{}\n", load);
-
-    println!("{BLUE}CPU  [{}] {:.1}%{RESET}", bar(cpu, 20), cpu);
-    println!(
-        "{RED}RAM  [{}] {:.1}%  ({} / {} MB){RESET}\n",
-        bar(mem_pct, 20),
-        mem_pct,
-        (total - avail) / 1024,
-        total / 1024
-    );
-
-    let worst = cpu.max(mem_pct);
-    if worst < 40.0 {
-        println!("{BLUE}Status: Tenang. Lingkungan sekitar aman.{RESET}");
-    } else if worst < 75.0 {
-        println!("{YELLOW}Status: Waspada. Ada aktivitas mencurigakan.{RESET}");
-    } else {
-        println!("{RED}Status: BAHAYA! Spider-Sense berdenyut!{RESET}");
-    }
-}
-EOF
-```
-
-### 9.4 Build dan tes di build-VM
+### 9.5 Build dan unit test di build-VM
 
 ```bash
 cd ~/spideros/tools/spider-sense
-cargo build --release
-./target/release/spider-sense
+cargo test
+cargo build --release --locked
+./target/release/spider-sense --once --no-color
+./target/release/spider-sense --watch
 ```
 
-Tes beban supaya status berubah:
+Yang diharapkan:
+
+- `cargo test` menjalankan 5 unit test dan semuanya lulus.
+- `cargo build --release --locked` menghasilkan `target/release/spider-sense`.
+- `--once --no-color` menampilkan satu frame metrik tanpa escape sequence warna.
+- `--watch` menampilkan layar yang diperbarui setiap detik.
+
+Uji beban agar status berubah:
 
 ```bash
-# jalankan di terminal lain untuk membebani CPU
+# terminal lain
 yes > /dev/null &
-./target/release/spider-sense
+# kembali ke terminal Spider-Sense, lalu hentikan beban
 kill %1
 ```
 
-### 9.5 Masukkan ke ISO
+Commit `Cargo.toml`, `Cargo.lock`, dan `src/main.rs`:
 
 ```bash
 cd ~/spideros
-INC=config/includes.chroot_after_packages
-mkdir -p $INC/usr/local/bin $INC/usr/share/applications
-
-# Salin binary hasil build Rust
-cp tools/spider-sense/target/release/spider-sense $INC/usr/local/bin/spider-sense
-chmod +x $INC/usr/local/bin/spider-sense
-
-cat > $INC/usr/share/applications/spider-sense.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=Spider-Sense
-Comment=Monitor kondisi sistem
-Exec=xfce4-terminal --hold -e spider-sense
-Icon=utilities-system-monitor
-Terminal=false
-Categories=System;Monitor;
-EOF
+git add tools/spider-sense
+git commit -m "feat: spider-sense rust std-only"
 ```
 
-Catatan: binary yang ada di `includes.chroot_after_packages` sengaja ikut di-commit karena ukurannya kecil. Jangan commit folder `target/` milik Rust (sudah ada di `.gitignore`).
+### 9.6 Integrasi ke ISO: kompilasi di dalam chroot via hook 0400
 
-Alias `sense` sudah ada di `.bash_aliases` (Phase 8). Build dan uji:
+Binary tidak dibangun di host lalu disalin. Proyek Rust disalin sementara ke chroot, dikompilasi oleh hook `0400-spider-sense-build.hook.chroot`, lalu toolchain build dibersihkan agar tidak ikut ke ISO. Pola ini menunjukkan pengelolaan build pipeline yang reproducible dan sesuai arsitektur target.
+
+**File yang perlu dibuat:**
+
+| File | Isi/tanggung jawab |
+|---|---|
+| `config/package-lists/spider-sense-build.list.chroot` | `cargo`, `rustc`, `build-essential` (build-only). |
+| `scripts/stage-spider-sense.sh` | Menyalin `tools/spider-sense/` ke `config/includes.chroot_after_packages/opt/spider-sense-src/`, mengecualikan `target/` dan `.git/`. |
+| `config/hooks/live/0400-spider-sense-build.hook.chroot` | Validasi source, `cargo build --release --locked --offline`, install binary ke `/usr/local/bin/spider-sense`, strip, smoke test `--once --no-color`, hapus source/target, purge paket build-only, apt clean. |
+| `config/includes.chroot_after_packages/usr/share/applications/spider-sense.desktop` | Desktop entry dengan `Exec=xfce4-terminal --hold -e spider-sense`. |
+| `.gitignore` | Tambahkan `config/includes.chroot_after_packages/opt/spider-sense-src/`. |
+
+**Urutan kerja:**
+
+1. Tambahkan paket build-only ke daftar paket.
+2. Buat skrip staging dan pastikan executable.
+3. Buat hook `0400` dan pastikan executable.
+4. Panggil `./scripts/stage-spider-sense.sh` di `scripts/build.sh` tepat setelah `cd "$(dirname "$0")/.."`.
+5. Buat desktop entry.
+6. Build dengan `./scripts/build.sh v0.6`.
+7. Verifikasi di chroot: binary ELF, smoke test, dan `cargo`/`rustc` sudah tidak ada.
+
+### 9.7 Verifikasi di ISO
+
+Boot ISO hasil build di `[TEST-VM]`, lalu jalankan:
 
 ```bash
-./scripts/build.sh v0.6
+command -v spider-sense
+file /usr/local/bin/spider-sense
+spider-sense --version
+spider-sense --once --no-color
+spider-sense --watch
 ```
 
-Di `[TEST-VM]`: jalankan `spider-sense` dan `sense`, dan buka lewat menu aplikasi (kategori System). 📸 `P09-spidersense-01.png`.
+Yang diharapkan:
 
-### 9.6 Bahan penjelasan untuk dosen
+- `command -v` menemukan `/usr/local/bin/spider-sense`.
+- `file` menampilkan executable ELF 64-bit, bukan shell script.
+- `--version` menampilkan `spider-sense 1.0.0 (Rust, std-only)`.
+- `--once --no-color` menampilkan CPU, RAM, proses, uptime, dan load dari `/proc` aktif.
+- `--watch` memperbarui layar setiap detik dan status berubah saat CPU dibebani.
 
-Siapkan jawaban singkat untuk pertanyaan seperti ini:
+### 9.8 Bahan penjelasan untuk dosen
 
 | Pertanyaan | Jawaban inti |
 |---|---|
 | Apa itu `/proc`? | Filesystem virtual yang dibuat kernel di memori; file di dalamnya tidak ada di disk, isinya informasi kernel saat itu juga |
 | Kenapa tiap proses punya folder angka? | Nama folder = PID, kernel menyediakan info per proses di sana |
-| Kenapa CPU dihitung dari dua sampel? | `/proc/stat` berisi hitungan kumulatif sejak boot; penggunaan didapat dari selisih dalam rentang waktu |
-| Kenapa pakai `MemAvailable`, bukan `MemFree`? | `MemFree` tidak menghitung cache yang bisa dilepas; `MemAvailable` perkiraan memori yang benar-benar bisa dipakai aplikasi |
+| Kenapa CPU dihitung dari dua sampel? | `/proc/stat` berisi hitungan kumulatif sejak boot; penggunaan didapat dari selisih dua sampel dalam rentang waktu |
+| Kenapa pakai `MemAvailable`, bukan `MemFree`? | `MemFree` tidak menghitung cache yang bisa dilepas; `MemAvailable` memperkirakan memori yang benar-benar bisa dipakai aplikasi |
 | Apa itu load average? | Rata-rata jumlah proses yang siap jalan atau menunggu I/O dalam 1, 5, 15 menit |
-| Kenapa pakai Rust? | Rust menghasilkan binary statis yang aman (memory safety), cepat (comparable dengan C++), dan modern — cocok untuk tool sistem |
-| Apa itu ownership & borrowing di Rust? | Sistem unik Rust yang menjamin memory safety tanpa garbage collector — cocok untuk tool sistem yang harus ringan |
+| Bagaimana rendering ANSI dilakukan? | Escape sequence `ESC[2J` membersihkan layar, `ESC[H` memindahkan kursor, dan kode warna seperti `ESC[1;31m` memberi warna merah |
+| Kenapa tidak memakai library monitoring? | Tujuannya melatih pemrograman sistem: membaca format kernel, mem-parsing manual, dan membangun renderer sendiri |
+| Di mana kode dikompilasi? | Di dalam chroot saat build ISO, melalui hook `0400-spider-sense-build.hook.chroot`; bukan binary yang dibangun di host |
+| Bagaimana membuktikan binary masuk ISO? | `file`, `--version`, `--once`, dan `--watch` dijalankan di `[TEST-VM]`; lihat Phase 10.3 |
+| Kenapa memakai Rust? | Rust memberi memory safety tanpa garbage collector, binary native tanpa runtime bahasa, dan cocok untuk tool sistem yang ringan |
+| Apa itu ownership dan borrowing? | Sistem Rust yang menjamin keamanan memori tanpa garbage collector; cocok untuk tool sistem yang harus ringan dan aman |
 
-### 9.7 Checklist Phase 9
+### 9.9 Checklist Phase 9
 
-- [ ] Proyek Rust dibuat dengan `cargo new`
-- [ ] Kode jalan di build-VM (`cargo build --release`)
-- [ ] Binary masuk ISO, bisa dijalankan dari terminal dan menu
-- [ ] Tim bisa menjelaskan cara kerja kode (tiap anggota minimal tahu alurnya)
+- [ ] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan `src/main.rs`
+- [ ] Tidak ada dependency eksternal; hanya `std`
+- [ ] `cargo test` lulus (5 unit test)
+- [ ] `cargo build --release --locked` sukses
+- [ ] `--once` dan `--watch` berjalan di build-VM
+- [ ] `0400-spider-sense-build.hook.chroot` ada dan executable
+- [ ] `spider-sense-build.list.chroot` dan `scripts/stage-spider-sense.sh` ada
+- [ ] Binary berada di `/usr/local/bin/spider-sense` di dalam chroot
+- [ ] `cargo` dan `rustc` tidak ikut ke ISO final
+- [ ] Tim dapat menjelaskan alur parser, sampler, renderer ANSI, dan hook build
 - [ ] Commit dan snapshot (`P9-spidersense`)
 
-✅ **Selesai kalau:** `spider-sense` jalan di ISO. Kalau tidak sempat, tulis di laporan sebagai pengembangan lanjutan dan jangan memaksakan.
+✅ **Selesai kalau:** `spider-sense` berhasil dikompilasi di chroot dan berjalan di ISO. Jika gagal, perbaiki pipeline sebelum melanjutkan ke Phase 10.
 
 ---
 
@@ -1785,13 +1767,61 @@ Uji di VM BIOS dan VM UEFI. Isi tabel (salin ke `docs/catatan.md`):
 | 9 | Firefox terbuka dan membuka situs |  |  |  |
 | 10 | VLC terbuka |  |  |  |
 | 11 | File manager, mousepad, screenshot |  |  |  |
-| 12 | `spider-sense` jalan |  |  |  |
-| 13 | `sudo ufw status` aktif |  |  |  |
-| 14 | Reboot dan shutdown normal |  |  |  |
+| 12 | `spider-sense --version` menampilkan identitas Rust |  |  |  |
+| 13 | `spider-sense --once --no-color` menampilkan metrik `/proc` |  |  |  |
+| 14 | `spider-sense --watch` memperbarui layar real-time |  |  |  |
+| 15 | `cargo` dan `rustc` tidak ada di ISO final |  |  |  |
+| 16 | `sudo ufw status` aktif |  |  |  |
+| 17 | Reboot dan shutdown normal |  |  |  |
 
 Isi dengan `Lulus` atau `Gagal` plus catatan.
 
-### 10.3 Data performa untuk BAB IV (bukti "ringan dan efisien")
+### 10.3 Verifikasi khusus binary Spider-Sense
+
+Verifikasi ini membuktikan bahwa komponen koding benar-benar terintegrasi ke ISO, bukan hanya ada di repositori.
+
+Di `[TEST-VM]`:
+
+```bash
+command -v spider-sense
+file /usr/local/bin/spider-sense
+spider-sense --version
+spider-sense --once --no-color
+spider-sense --watch
+```
+
+Yang diharapkan:
+
+- `command -v` menemukan `/usr/local/bin/spider-sense`.
+- `file` menampilkan executable ELF 64-bit, bukan skrip.
+- `--version` menampilkan `spider-sense 1.0.0 (Rust, std-only)`.
+- `--once --no-color` menampilkan CPU, RAM, jumlah proses, uptime, dan load dari `/proc`.
+- `--watch` memperbarui layar setiap detik.
+- `command -v cargo` dan `command -v rustc` gagal, tanda toolchain build sudah dibersihkan.
+
+Bukti tambahan bahwa source dan toolchain tidak ikut ke ISO:
+
+```bash
+test ! -d /opt/spider-sense-src && echo "OK: source staging tidak ikut"
+! command -v cargo && echo "OK: cargo tidak ikut"
+! command -v rustc && echo "OK: rustc tidak ikut"
+```
+
+Di `[BUILD-VM]`, verifikasi statis isi ISO tanpa boot:
+
+```bash
+xorriso -osirrox on -indev dist/spideros-v1.0-rc1.iso \
+  -extract /live/filesystem.squashfs /tmp/spideros-fs.squashfs
+
+unsquashfs -l /tmp/spideros-fs.squashfs | grep -E "spider-sense|spider-sense.desktop"
+
+unsquashfs -d /tmp/spideros-root /tmp/spideros-fs.squashfs usr/local/bin/spider-sense
+file /tmp/spideros-root/usr/local/bin/spider-sense
+```
+
+📸 `P10-spidersense-01.png` (output `--once`), `P10-spidersense-watch-01.png` (tampilan `--watch`).
+
+### 10.4 Data performa untuk BAB IV (bukti "ringan dan efisien")
 
 Jalankan di `[TEST-VM]` setelah desktop idle sekitar 1 menit:
 
@@ -1809,13 +1839,13 @@ Di build-VM:
 ls -lh dist/spideros-v1.0-rc1.iso    # ukuran ISO
 ```
 
-Catat semua angka. Untuk pembanding, kamu bisa mencatat RAM idle Debian XFCE default atau Ubuntu di VM yang sama.
+Catat semua angka. Sebagai pembanding, data RAM idle Debian XFCE default atau Ubuntu pada VM yang sama dapat dicatat.
 
-### 10.4 Hentikan penambahan fitur
+### 10.5 Hentikan penambahan fitur
 
 Setelah rc1 jadi, daftar bug masuk ke `docs/bug-log.md` (format di Phase 12). Fitur baru tidak boleh ditambah, kecuali perbaikan bug.
 
-### 10.5 Commit, tag, snapshot
+### 10.6 Commit, tag, snapshot
 
 ```bash
 git add -A
@@ -1825,10 +1855,11 @@ git tag v1.0-rc1
 
 Snapshot: `P10-rc1`.
 
-### 10.6 Checklist Phase 10
+### 10.7 Checklist Phase 10
 
 - [ ] Build bersih sukses, checksum dibuat
-- [ ] 14 pengujian dicoba di BIOS dan UEFI, hasil tercatat
+- [ ] 17 pengujian dicoba di BIOS dan UEFI, hasil tercatat
+- [ ] Verifikasi khusus `spider-sense` (binary ELF, `--version`, `--once`, `--watch`, toolchain bersih) lulus
 - [ ] Data performa terkumpul
 - [ ] Tag Git dan snapshot dibuat
 
@@ -1919,10 +1950,10 @@ Fast Startup Windows kadang mengganggu: matikan dulu (Control Panel → Power Op
 
 Isi untuk tiap perangkat yang diuji:
 
-| Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Catatan |
-|---|---|---|---|---|---|---|---|---|
-|  | UEFI | Off |  |  |  |  |  |  |
-|  | Legacy | n/a |  |  |  |  |  |  |
+| Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Spider-Sense | Catatan |
+|---|---|---|---|---|---|---|---|---|---|
+|  | UEFI | Off |  |  |  |  |  |  |  |
+|  | Legacy | n/a |  |  |  |  |  |  |  |
 
 Targetkan minimal 2 perangkat berbeda.
 
@@ -2003,7 +2034,8 @@ Urutkan prioritas: (1) tidak bisa boot, (2) tidak bisa dipakai, (3) tampilan, (4
 | Layar hitam di GPU tertentu | Tambah `firmware-amd-graphics` atau gunakan menu failsafe, catat sebagai keterbatasan |
 | Touchpad tidak ada tap-to-click | Tambah `xserver-xorg-input-libinput`, atau atur lewat Settings |
 | Bahasa/keyboard | Ubah parameter `keyboard-layouts` dan `locales` |
-| ISO terlalu besar | Hapus paket berat (lihat 5.2) |
+| ISO terlalu besar | Hapus paket berat (lihat 5.2), pastikan toolchain Rust sudah dipurge oleh hook 0400 |
+| Spider-Sense gagal dikompilasi di chroot | Cek `Cargo.lock`, paket build-only, dan log hook 0400; jalankan `cargo build --release --locked` manual di `tools/spider-sense` |
 
 ### 12.3 Build v2
 
@@ -2015,7 +2047,7 @@ sudo lb clean --purge
 ./scripts/build.sh v1.0
 ```
 
-Ulangi uji: ringkasan 14 poin Phase 10 di VM, lalu uji ulang di perangkat bermasalah (Phase 11).
+Ulangi uji: ringkasan 17 poin Phase 10 di VM, lalu uji ulang di perangkat bermasalah (Phase 11).
 
 ### 12.4 Freeze
 
@@ -2033,7 +2065,7 @@ git tag v1.0
 sha256sum dist/spideros-v1.0.iso
 ```
 
-Buat `docs/RELEASE_NOTES.md` berisi: versi, tanggal, isi paket utama, fitur tema, keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
+Buat `docs/RELEASE_NOTES.md` berisi: versi, tanggal, isi paket utama, fitur tema, fitur Spider-Sense (`--once`, `--watch`, `--no-color`), keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
 
 Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk lain), plus satu flashdisk bootable siap presentasi.
 
@@ -2064,6 +2096,7 @@ Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk la
 | 3.2.2 Perancangan dan kustomisasi tampilan | Konsep visual, palet, daftar aset, rancangan tema | Phase 4, 6, 7, 8 (bagian rancangan) |
 | 3.2.3 Integrasi aplikasi pendukung | Daftar paket dan alasan pemilihan, firewall, firmware, Spider-Sense (Rust) | Phase 5, 9 |
 | 3.2.4 Proses remastering | Alur live-build (config, bootstrap, chroot, binary), struktur repo, hook | 2.1, 2.3, 6.1 |
+| 3.2.5 Perancangan perangkat lunak Spider-Sense | Arsitektur `main.rs`, parser `/proc`, sampler CPU, renderer ANSI, unit test, hook `0400` | 9.1–9.6 |
 | 3.3 Hasil yang diharapkan | Ringkasan target (ISO ringan, bertema, boot di BIOS dan UEFI) | Bagian 0.1 |
 
 **BAB IV Hasil dan Pembahasan**
@@ -2072,11 +2105,12 @@ Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk la
 |---|---|---|
 | 4.1.1 Lingkungan pengembangan | Spesifikasi VM, versi tools, struktur repo | Screenshot Phase 1, 2 |
 | 4.1.2 Kustomisasi tampilan | Hasil tema: desktop, login, boot menu, Plymouth, terminal | Screenshot Phase 6, 7, 8 |
+| 4.1.3 Implementasi dan pengujian Spider-Sense | Cuplikan kode parser dan renderer, hasil `cargo test`, verifikasi binary di ISO | Screenshot Phase 9, 10; `build.log` |
 | 4.2 Proses pembuatan ISO | Langkah build, log, ukuran ISO, checksum | Screenshot Phase 2, 10; `build.log` |
 | 4.3.1 Pembuatan media live boot | Rufus/Etcher, setting, hasil | Screenshot 11.3–11.4 |
 | 4.3.2 Pengujian booting dan boot sequence | Tabel matriks hardware, uraian boot sequence, tombol boot menu | Foto 11.8 dan 11.9 |
 | 4.4 Dokumentasi | Foto kerja tim, screenshot ringkas | Foto kelompok, screenshot |
-| (Tambahan) Pembahasan performa | RAM idle, waktu boot, ukuran ISO | Data 10.3 |
+| (Tambahan) Pembahasan performa | RAM idle, waktu boot, ukuran ISO | Data 10.4 |
 | (Tambahan) Pembahasan keterbatasan | Secure Boot, tanpa installer, driver NVIDIA | Catatan Phase 11, 12 |
 
 **BAB V Penutup**
@@ -2088,12 +2122,12 @@ Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk la
 
 Hubungkan juga ke RUP di Bab II: Inception (Phase 1), Elaboration (Phase 2 dan 3), Construction (Phase 4–10), Transition (Phase 11–13).
 
-### 13.2 Penjelasan untuk dosen: kenapa live-build, bukan Cubic
+### 13.2 Penjelasan untuk dosen: mengapa live-build
 
 Tulis alasan singkat di Bab III:
-- live-build adalah tool resmi proyek Debian Live, jalan native di Debian 13 (basis proyek).
+- live-build adalah tool resmi proyek Debian Live dan berjalan native di Debian 13 (basis proyek).
 - Seluruh konfigurasi berupa file (paket, hook, include) sehingga ISO dapat dibangun ulang secara konsisten dan terdokumentasi di Git.
-- Cubic dirancang untuk lingkungan Ubuntu dan bersifat interaktif, kurang cocok untuk alur kerja yang konsisten pada Debian.
+- Proses build dapat diotomasi, termasuk kompilasi komponen Rust di dalam chroot melalui hook.
 - Tujuan proposal (membuat distro turunan Debian dengan menambah/mengurangi paket, tema, dan konfigurasi) tetap tercapai.
 
 ### 13.3 Panduan pengguna (tujuan penelitian poin 3)
@@ -2105,6 +2139,7 @@ Buat `docs/PANDUAN_PENGGUNA.md`:
 - Cara boot (tombol boot menu per merek, matikan Secure Boot)
 - Login: user `spider`, password `live`
 - Tur fitur: desktop, aplikasi, `spider-sense`, `neofetch`
+- Cara memakai Spider-Sense: `spider-sense`, `spider-sense --once`, `spider-sense --watch`, `spider-sense --help`
 - Tips: mengubah wallpaper, mengatur WiFi, shutdown
 - Keterbatasan dan masalah umum
 - Cara membangun ulang ISO (rujuk repo dan `scripts/build.sh`)
@@ -2116,10 +2151,11 @@ Skenario 3–5 menit, direkam dengan OBS Studio atau perekam layar bawaan:
 - (0:20) Boot menu SpiderOS (sebutkan BIOS dan UEFI)
 - (0:50) Plymouth lalu desktop
 - (1:20) Tur tampilan: wallpaper, login, ikon
-- (1:50) Terminal: `neofetch`, prompt, `spider-sense`
+- (1:50) Terminal: `neofetch`, prompt, `spider-sense --once`, `spider-sense --watch`
 - (2:30) Aplikasi: Firefox, VLC
 - (3:00) Tunjukkan `cat /proc/cmdline` dan `findmnt /` (bukti live boot)
-- (3:30) Penutup
+- (3:30) Tunjukkan source Rust dan hook `0400-spider-sense-build.hook.chroot` di repositori
+- (4:10) Penutup
 
 Simpan video di dua tempat.
 
@@ -2139,22 +2175,24 @@ Checklist H-1:
 - [ ] Pembagian bicara jelas, semua anggota paham alur teknis
 - [ ] Latihan sekali penuh dengan timer
 
-### 13.6 Pertanyaan yang mungkin ditanyakan dosen
+### 13.6 Pertanyaan yang mungkin diajukan dosen
 
 | Pertanyaan | Arah jawaban |
 |---|---|
 | Ini remastering atau membuat distro baru? | Distro turunan Debian: paket, tema, dan konfigurasi diubah dari Debian 13, kernel dan sistem inti tetap dari Debian |
-| Apa beda live-build dan Cubic? | Lihat 13.2 |
+| Mengapa memilih live-build? | Tool resmi Debian Live; konfigurasi berbasis file, reproducible, dan mudah diotomasi (lihat 13.2) |
 | Bagaimana ISO bisa boot di BIOS dan UEFI? | ISO hybrid, ada MBR/ISOLINUX untuk BIOS dan partisi EFI untuk UEFI (bukti `xorriso -report_el_torito`) |
 | Apa itu squashfs dan overlay? | Squashfs = filesystem terkompresi read-only berisi sistem; overlay = lapisan tulis di RAM di atasnya sehingga sistem live bisa dipakai tanpa menulis ke USB |
 | Perubahan hilang setelah reboot, kenapa? | Sistem live tidak persisten secara default; persistensi bisa ditambahkan (Lampiran E) |
 | Kenapa Secure Boot harus mati? | Bootloader tidak ditandatangani Microsoft/shim |
-| Apa kontribusi koding kalian? | Spider-Sense ditulis dalam **Rust**, membaca `/proc` (lihat 9.6) — memanfaatkan memory safety dan performa Rust |
-| Kenapa pakai Rust, bukan C++? | Rust menjamin memory safety tanpa garbage collector, cocok untuk tool sistem; modern, dan jadi nilai tambah di laporan |
+| Apa kontribusi koding tim? | Spider-Sense ditulis dalam **Rust**, membaca dan mem-parsing `/proc` secara manual, lalu merender ANSI (lihat 9.8) |
+| Kenapa memakai Rust? | Rust menjamin memory safety tanpa garbage collector, menghasilkan binary native tanpa runtime bahasa, dan cocok untuk tool sistem |
+| Di mana kode dikompilasi? | Di dalam chroot saat build ISO melalui hook `0400-spider-sense-build.hook.chroot`, bukan binary yang dibangun di host |
 
 ### 13.7 Checklist Phase 13
 
 - [ ] BAB III sampai V lengkap dan konsisten dengan ISO final
+- [ ] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
 - [ ] Daftar pustaka dan atribusi aset (credits) lengkap
 - [ ] Panduan pengguna, video demo, release notes siap
 - [ ] Latihan presentasi selesai, rencana A, B, C siap
@@ -2188,9 +2226,19 @@ sudo chroot chroot dpkg -l | wc -l
 
 # Rust / Spider-Sense
 cd tools/spider-sense
-cargo build --release               # build release
-./target/release/spider-sense       # jalankan
+cargo test                          # unit test parser, bar, uptime
+cargo build --release --locked      # build release
+./target/release/spider-sense --once --no-color
+./target/release/spider-sense --watch
 cargo clean                         # hapus target/
+
+# Verifikasi integrasi di chroot dan ISO
+./scripts/stage-spider-sense.sh
+sudo chroot chroot /usr/local/bin/spider-sense --once --no-color
+sudo chroot chroot sh -c 'command -v cargo || echo "cargo sudah dibersihkan"'
+xorriso -osirrox on -indev dist/spideros-vX.Y.iso \
+  -extract /live/filesystem.squashfs /tmp/spideros-fs.squashfs
+unsquashfs -l /tmp/spideros-fs.squashfs | grep spider-sense
 
 # Git
 git status
@@ -2218,8 +2266,13 @@ du -sh chroot cache binary 2>/dev/null
 | Jaringan | Tidak ada WiFi | Firmware paket, chipset (`lspci -nnk`), `rfkill list` |
 | Disk | Penuh | `df -h`, `sudo lb clean --purge`, perbesar VM disk |
 | Waktu | Error "not valid yet" | `timedatectl set-ntp true` |
-| Rust | `cargo: command not found` | `sudo apt install cargo rustc` |
-| Rust | Build gagal | Baca error `cargo build`, biasanya typo atau import kurang |
+| Rust | `cargo: command not found` di build-VM | `sudo apt install cargo rustc` |
+| Rust | Build gagal | Baca error `cargo build`, biasanya typo, import kurang, atau `Cargo.lock` belum ada |
+| Rust | Hook 0400 gagal | Pastikan `scripts/stage-spider-sense.sh` dijalankan, `Cargo.lock` ada, dan paket `cargo rustc build-essential` masuk daftar build-only |
+| Rust | `--locked` gagal | Jalankan `cargo generate-lockfile` di `tools/spider-sense`, commit `Cargo.lock`, lalu build ulang |
+| Rust | Binary tidak ada di ISO | Cek log hook 0400, jalankan `sudo chroot chroot /usr/local/bin/spider-sense --once --no-color` |
+| Rust | Error linker di chroot | Pastikan `build-essential` ada di `spider-sense-build.list.chroot` |
+| Rust | Tampilan ANSI berantakan | Jalankan `spider-sense --once --no-color` untuk memisahkan masalah data dari masalah rendering |
 
 ### Lampiran C: Struktur akhir repo
 
@@ -2230,12 +2283,15 @@ spideros/
  │   ├── clean
  │   └── config
  ├── config/
- │   ├── package-lists/spideros.list.chroot
+ │   ├── package-lists/
+ │   │   ├── spideros.list.chroot
+ │   │   └── spider-sense-build.list.chroot   # cargo, rustc, build-essential (build-only)
  │   ├── hooks/live/
  │   │   ├── 0050-system-config.hook.chroot
  │   │   ├── 0100-theme.hook.chroot
  │   │   ├── 0200-plymouth.hook.chroot
- │   │   └── 0300-branding.hook.chroot
+ │   │   ├── 0300-branding.hook.chroot
+ │   │   └── 0400-spider-sense-build.hook.chroot
  │   ├── bootloaders/                       # template boot menu yang diedit
  │   └── includes.chroot_after_packages/
  │       ├── etc/
@@ -2248,15 +2304,18 @@ spideros/
  │       │           └── xfce4/
  │       │               ├── terminal/terminalrc
  │       │               └── xfconf/xfce-perchannel-xml/{xsettings.xml,xfwm4.xml}
+ │       ├── opt/spider-sense-src/           # staging generated (gitignored)
  │       └── usr/
- │           ├── local/bin/{spideros-wallpaper,spider-sense}
+ │           ├── local/bin/spideros-wallpaper
  │           ├── share/applications/spider-sense.desktop
  │           ├── share/backgrounds/spiderman/{wallpaper.png,login.png}
  │           ├── share/pixmaps/spideros-logo.png
  │           └── share/plymouth/themes/spiderman/{spiderman.plymouth,spiderman.script,logo.png}
  ├── assets-src/ , assets-final/
- ├── tools/spider-sense/                    # proyek Rust (Cargo.toml, src/main.rs)
- ├── scripts/build.sh
+ ├── tools/spider-sense/                    # proyek Rust: Cargo.toml, Cargo.lock, src/main.rs
+ ├── scripts/
+ │   ├── build.sh
+ │   └── stage-spider-sense.sh
  ├── dist/                                  # ISO hasil (tidak di-commit)
  └── docs/
      ├── catatan.md, bug-log.md, desain.md, credits.md
@@ -2279,7 +2338,7 @@ spideros/
 - [ ] Phase 6: Tema desktop
 - [ ] Phase 7: Boot menu dan Plymouth
 - [ ] Phase 8: Branding terminal
-- [ ] Phase 9: Spider-Sense (Rust, bonus)
+- [ ] Phase 9: Spider-Sense (Rust, komponen inti koding)
 - [ ] Phase 10: ISO v1 rc dan uji VM
 
 **Penutupan**
@@ -2305,6 +2364,10 @@ spideros/
 - Debian Live Manual (live-build): https://live-team.pages.debian.net/live-manual/
 - Debian Wiki, DebianLive: https://wiki.debian.org/DebianLive
 - Rust Book (untuk Spider-Sense): https://doc.rust-lang.org/book/
+- Rust Standard Library: https://doc.rust-lang.org/std/
+- Cargo Book: https://doc.rust-lang.org/cargo/
+- Linux `proc(5)` manual: https://man7.org/linux/man-pages/man5/proc.5.html
+- ECMA-48 (Control Functions for Coded Character Sets) untuk ANSI escape sequence
 - Dokumentasi Plymouth: lihat `/usr/share/plymouth/themes/` di sistem Debian
 - Silberschatz et al. (2018), *Operating System Concepts*
 - Harjono (2016) tentang remastering Debian
