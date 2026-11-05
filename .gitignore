@@ -1,0 +1,17 @@
+﻿# artefak build live-build
+/chroot/
+/binary/
+/cache/
+/.build/
+/config/binary
+/config/bootstrap
+/config/chroot
+/config/common
+/config/source
+*.iso
+*.log
+live-image-*
+dist/*
+!dist/.gitkeep
+# Rust
+tools/spider-sense/target/
