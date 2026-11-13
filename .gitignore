@@ -8,10 +8,18 @@
 /config/chroot
 /config/common
 /config/source
+/config/hooks
 *.iso
 *.log
 live-image-*
 dist/*
 !dist/.gitkeep
+config/includes.chroot_after_packages/opt/spider-sense-src/
+binary.modified_timestamps
+chroot.files
+chroot.packages.install
+chroot.packages.live
+config/package-lists/live.list.chroot
+
 # Rust
 tools/spider-sense/target/
