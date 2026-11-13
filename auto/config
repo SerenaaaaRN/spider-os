@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+lb config noauto \
+    --mode debian \
+    --distribution trixie \
+    --architectures amd64 \
+    --linux-flavours amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --binary-images iso-hybrid \
+    --debian-installer none \
+    --memtest none \
+    --bootappend-live "boot=live components quiet splash username=spider hostname=spideros locales=en_US.UTF-8 keyboard-layouts=us timezone=Asia/Jakarta" \
+    --iso-application "SpiderOS" \
+    --iso-publisher "Tim Sistem Operasi UNSRI" \
+    --iso-volume "SPIDEROS" \
+    "${@}"
