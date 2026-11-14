@@ -11,6 +11,7 @@ Modul praktik lengkap dari nol sampai ISO jadi, diuji di USB asli, dan siap dila
 - Tampilan bertema Spider-Man: wallpaper, tema GTK, ikon, login screen, boot menu, animasi boot (Plymouth), terminal.
 - Branding sistem: `neofetch`, prompt bash, `/etc/os-release`.
 - Aplikasi dasar yang ringan dan berguna.
+- **Hiburan offline**: kolektor komik (YACReader) — aplikasi tracking dengan cover, sinopsis, dan status dibaca (komik diisi pengguna sendiri), plus game bawaan dari repo Debian.
 - **Komponen inti koding**: tool Spider-Sense (**Rust**) yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka terminal dengan ANSI.
 - Dokumentasi lengkap yang langsung jadi bahan BAB III, IV, dan V.
 
@@ -42,6 +43,8 @@ Folder kerja: `~/spideros`. Semua perintah dijalankan dari situ kecuali disebut 
 | 7 | Branding boot (boot menu, Plymouth) | Construction | 3–4 jam |
 | 8 | Branding terminal dan sistem | Construction | 2–3 jam |
 | 9 | Spider-Sense (Rust, komponen inti koding) | Construction | 8–12 jam |
+| 9.5 | Kolektor komik offline (YACReader) | Construction | 1–2 jam |
+| 9.6 | Game offline dari repo Debian | Construction | 1–2 jam |
 | 10 | Build ISO v1 dan uji menyeluruh di VM | Construction | 2–3 jam |
 | 11 | Flash USB dan uji hardware (UEFI dan Legacy) | Transition | 3–5 jam |
 | 12 | Perbaikan bug, ISO v2, freeze | Transition | 2–4 jam |
@@ -1735,6 +1738,150 @@ Yang diharapkan:
 
 ---
 
+## PHASE 9.5: Kolektor Komik Offline — YACReader
+
+**Tujuan:** distro punya aplikasi kolektor komik: cover, sinopsis, dan status sudah/belum dibaca.
+**Output:** `yacreader` terpasang, desktop entry di menu aplikasi, folder koleksi siap pakai.
+**Status:** tambahan (wajib selesai sebelum rc1 — feature freeze Phase 10.5).
+
+Keputusan konten: **ISO hanya menyediakan aplikasinya, bukan komiknya.** Tim tidak membuat komik. YACReader adalah aplikasi koleksi (karya komunitas, GPLv3, dari repo Debian): pengguna yang mengisi komiknya sendiri setelah install — dari koleksi pribadi mereka. Aplikasi otomatis menampilkan cover, sinopsis (dari metadata CBZ), dan status dibaca untuk koleksi apapun yang ditambahkan.
+
+### 9.5.1 Daftar paket konten
+
+```bash
+cat > config/package-lists/content.list.chroot <<'EOF'
+# --- Kolektor komik offline (tracking cover, sinopsis, status dibaca) ---
+yacreader
+
+# --- Media offline ---
+mpv
+audacious
+EOF
+```
+
+### 9.5.2 Folder koleksi siap pakai
+
+Siapkan folder kosong yang rapi supaya pengguna langsung tahu ke mana menaruh komik:
+
+```bash
+INC=config/includes.chroot_after_packages
+mkdir -p $INC/usr/share/spideros/comics
+cat > $INC/usr/share/spideros/comics/README.txt <<'EOF'
+Letakkan file komik (.cbz/.cbr/.pdf) di folder ini,
+lalu buka aplikasi "SpiderOS Comics" dan tambahkan
+folder ini sebagai library.
+EOF
+```
+
+### 9.5.3 Desktop entry
+
+```bash
+INC=config/includes.chroot_after_packages
+cat > $INC/usr/share/applications/spideros-comics.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=SpiderOS Comics
+Comment=Kolektor komik offline: cover, sinopsis, status dibaca
+Exec=yacreader
+Icon=yacreader
+Categories=Graphics;
+EOF
+```
+
+### 9.5.4 Verifikasi di TEST-VM
+
+- [ ] `command -v yacreader` menemukan binary
+- [ ] Buka "SpiderOS Comics" dari menu aplikasi → aplikasi jalan
+- [ ] Uji tracking: tambahkan satu file CBZ apa pun dari folder `comics/` (bisa buat dummy: zip berisi beberapa PNG) → cover tampil
+- [ ] Tandai "sudah dibaca", tutup, buka lagi → status tersimpan
+- [ ] `mpv` dan `audacious` terbuka
+
+📸 `P9.5-comics-01.png` (aplikasi terbuka), `P9.5-comics-tracking-01.png` (status dibaca tersimpan).
+
+### 9.5.5 Checklist Phase 9.5
+
+- [ ] `content.list.chroot` ada (`yacreader`, `mpv`, `audacious`)
+- [ ] Folder `/usr/share/spideros/comics/` dengan README ada
+- [ ] Desktop entry "SpiderOS Comics" muncul di menu
+- [ ] Cover, sinopsis, dan status dibaca teruji dengan file uji di TEST-VM
+- [ ] Commit dan snapshot (`P9.5-comics`)
+
+✅ **Selesai kalau:** membuka menu aplikasi → "SpiderOS Comics" → tracking jalan pada komik apapun yang pengguna tambahkan sendiri, tanpa internet.
+
+---
+
+## PHASE 9.6: Game Offline dari Repo Debian
+
+**Tujuan:** distro punya game bawaan untuk hiburan offline.
+**Output:** 1–4 game ringan terpasang, terjangkau dari menu aplikasi.
+**Status:** tambahan (wajib selesai sebelum rc1).
+
+Keputusan: game **di-install dari repo Debian** (karya komunitas, legal, offline), bukan dikoding tim. Fokus koding tetap pada Spider-Sense — game di sini adalah pelengkap hiburan, bukan komponen penilaian.
+
+### 9.6.1 Daftar paket game
+
+```bash
+cat > config/package-lists/games.list.chroot <<'EOF'
+# --- Terminal game ---
+bastet                 # tetris clone yang sangat populer
+nethack-console        # roguelike klasik
+
+# --- Game GUI ringan (sudah menyediakan desktop entry sendiri) ---
+gnome-mines
+gnome-sudoku
+EOF
+```
+
+Ukurannya wajar (< 10 MB total). Jangan tambah game besar (Supertux, Wesnoth) — membengkakkan ISO tanpa menambah identitas.
+
+### 9.6.2 Desktop entry untuk game terminal
+
+`gnome-mines` dan `gnome-sudoku` otomatis muncul di menu. Game terminal perlu wrapper:
+
+```bash
+INC=config/includes.chroot_after_packages
+cat > $INC/usr/share/applications/spideros-bastet.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Bastet (Tetris)
+Comment=Tetris clone dari repo Debian
+Exec=xfce4-terminal --hold -e bastet
+Icon=org.gnome.SwellFoop
+Categories=Game;BlocksGame;
+EOF
+
+cat > $INC/usr/share/applications/spideros-nethack.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=NetHack
+Comment=Roguelike klasik
+Exec=xfce4-terminal --hold -e nethack
+Icon=org.gnome.SwellFoop
+Categories=Game;RolePlaying;
+EOF
+```
+
+`--hold` menjaga terminal tetap terbuka setelah game keluar.
+
+### 9.6.3 Verifikasi di TEST-VM
+
+- [ ] `bastet`, `nethack`, Mines, dan Sudoku terbuka dari menu aplikasi
+- [ ] Game terminal playable dengan keyboard, keluar dengan `q`/`Ctrl+C`
+- [ ] Highscore/game state tidak menyebabkan error saat ditutup
+
+📸 `P9.6-game-01.png` (menu aplikasi dengan game terlihat), `P9.6-bastet-01.png`.
+
+### 9.6.4 Checklist Phase 9.6
+
+- [ ] `games.list.chroot` ada dan terpasang di ISO
+- [ ] Desktop entry game terminal muncul di menu
+- [ ] Semua game teruji di TEST-VM (BIOS dan UEFI cukup sekali)
+- [ ] Commit dan snapshot (`P9.6-games`)
+
+✅ **Selesai kalau:** pengguna baru bisa main game dari menu aplikasi tanpa instalasi tambahan.
+
+---
+
 ## PHASE 10: Build ISO v1 dan Uji Menyeluruh di VM
 
 **Tujuan:** menghasilkan ISO kandidat rilis (v1.0-rc1) dari build bersih dan mengujinya sistematis.
@@ -1773,6 +1920,10 @@ Uji di VM BIOS dan VM UEFI. Isi tabel (salin ke `docs/catatan.md`):
 | 15 | `cargo` dan `rustc` tidak ada di ISO final |  |  |  |
 | 16 | `sudo ufw status` aktif |  |  |  |
 | 17 | Reboot dan shutdown normal |  |  |  |
+| 18 | "SpiderOS Comics" (YACReader) terbuka, cover + status dibaca jalan |  |  |  |
+| 19 | Folder `/usr/share/spideros/comics/` ada dengan README |  |  |  |
+| 20 | Game dari repo terbuka dari menu (`bastet`, NetHack, Mines, Sudoku) |  |  |  |
+| 21 | `mpv` dan `audacious` terbuka |  |  |  |
 
 Isi dengan `Lulus` atau `Gagal` plus catatan.
 
@@ -1858,7 +2009,7 @@ Snapshot: `P10-rc1`.
 ### 10.7 Checklist Phase 10
 
 - [ ] Build bersih sukses, checksum dibuat
-- [ ] 17 pengujian dicoba di BIOS dan UEFI, hasil tercatat
+- [ ] 21 pengujian dicoba di BIOS dan UEFI, hasil tercatat
 - [ ] Verifikasi khusus `spider-sense` (binary ELF, `--version`, `--once`, `--watch`, toolchain bersih) lulus
 - [ ] Data performa terkumpul
 - [ ] Tag Git dan snapshot dibuat
@@ -2047,7 +2198,7 @@ sudo lb clean --purge
 ./scripts/build.sh v1.0
 ```
 
-Ulangi uji: ringkasan 17 poin Phase 10 di VM, lalu uji ulang di perangkat bermasalah (Phase 11).
+Ulangi uji: ringkasan 21 poin Phase 10 di VM, lalu uji ulang di perangkat bermasalah (Phase 11).
 
 ### 12.4 Freeze
 
@@ -2139,6 +2290,8 @@ Buat `docs/PANDUAN_PENGGUNA.md`:
 - Cara boot (tombol boot menu per merek, matikan Secure Boot)
 - Login: user `spider`, password `live`
 - Tur fitur: desktop, aplikasi, `spider-sense`, `neofetch`
+- Aplikasi "SpiderOS Comics": cara menambahkan komik ke folder `/usr/share/spideros/comics/` (cover, sinopsis, status dibaca)
+- Game bawaan: Mines, Sudoku, Bastet, NetHack
 - Cara memakai Spider-Sense: `spider-sense`, `spider-sense --once`, `spider-sense --watch`, `spider-sense --help`
 - Tips: mengubah wallpaper, mengatur WiFi, shutdown
 - Keterbatasan dan masalah umum
@@ -2153,9 +2306,11 @@ Skenario 3–5 menit, direkam dengan OBS Studio atau perekam layar bawaan:
 - (1:20) Tur tampilan: wallpaper, login, ikon
 - (1:50) Terminal: `neofetch`, prompt, `spider-sense --once`, `spider-sense --watch`
 - (2:30) Aplikasi: Firefox, VLC
-- (3:00) Tunjukkan `cat /proc/cmdline` dan `findmnt /` (bukti live boot)
-- (3:30) Tunjukkan source Rust dan hook `0400-spider-sense-build.hook.chroot` di repositori
-- (4:10) Penutup
+- (2:40) Aplikasi "SpiderOS Comics": tambahkan satu CBZ uji, tampilkan cover dan status dibaca
+- (3:00) Game bawaan: GNOME Mines atau `bastet` (~20 detik)
+- (3:20) Tunjukkan `cat /proc/cmdline` dan `findmnt /` (bukti live boot)
+- (3:50) Tunjukkan source Rust dan hook `0400-spider-sense-build.hook.chroot` di repositori
+- (4:30) Penutup
 
 Simpan video di dua tempat.
 
@@ -2188,6 +2343,7 @@ Checklist H-1:
 | Apa kontribusi koding tim? | Spider-Sense ditulis dalam **Rust**, membaca dan mem-parsing `/proc` secara manual, lalu merender ANSI (lihat 9.8) |
 | Kenapa memakai Rust? | Rust menjamin memory safety tanpa garbage collector, menghasilkan binary native tanpa runtime bahasa, dan cocok untuk tool sistem |
 | Di mana kode dikompilasi? | Di dalam chroot saat build ISO melalui hook `0400-spider-sense-build.hook.chroot`, bukan binary yang dibangun di host |
+| Dari mana isi komik dan game-nya? | ISO menyediakan aplikasinya saja (YACReader dari repo Debian); pengguna mengisi komiknya sendiri setelah install. Game dan aplikasi lain di-install dari repo resmi Debian — tidak ada aset berhak cipta pihak ketiga di ISO |
 
 ### 13.7 Checklist Phase 13
 
@@ -2285,7 +2441,9 @@ spideros/
  ├── config/
  │   ├── package-lists/
  │   │   ├── spideros.list.chroot
- │   │   └── spider-sense-build.list.chroot   # cargo, rustc, build-essential (build-only)
+ │   │   ├── content.list.chroot                 # yacreader, mpv, audacious
+ │   │   ├── games.list.chroot                   # bastet, nethack-console, gnome-mines, gnome-sudoku
+ │   │   └── spider-sense-build.list.chroot      # cargo, rustc, build-essential (build-only)
  │   ├── hooks/live/
  │   │   ├── 0050-system-config.hook.chroot
  │   │   ├── 0100-theme.hook.chroot
@@ -2307,7 +2465,12 @@ spideros/
  │       ├── opt/spider-sense-src/           # staging generated (gitignored)
  │       └── usr/
  │           ├── local/bin/spideros-wallpaper
- │           ├── share/applications/spider-sense.desktop
+ │           ├── share/applications/
+ │           │   ├── spider-sense.desktop
+ │           │   ├── spideros-comics.desktop
+ │           │   ├── spideros-bastet.desktop
+ │           │   └── spideros-nethack.desktop
+ │           ├── share/spideros/comics/README.txt     # folder koleksi komik (diisi pengguna)
  │           ├── share/backgrounds/spiderman/{wallpaper.png,login.png}
  │           ├── share/pixmaps/spideros-logo.png
  │           └── share/plymouth/themes/spiderman/{spiderman.plymouth,spiderman.script,logo.png}
@@ -2339,6 +2502,8 @@ spideros/
 - [ ] Phase 7: Boot menu dan Plymouth
 - [ ] Phase 8: Branding terminal
 - [ ] Phase 9: Spider-Sense (Rust, komponen inti koding)
+- [ ] Phase 9.5: Kolektor komik offline (YACReader)
+- [ ] Phase 9.6: Game offline dari repo Debian
 - [ ] Phase 10: ISO v1 rc dan uji VM
 
 **Penutupan**

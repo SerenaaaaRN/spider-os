@@ -20,6 +20,8 @@ chroot.files
 chroot.packages.install
 chroot.packages.live
 config/package-lists/live.list.chroot
+.agents/*
+skills-lock.json
 
 # Rust
 tools/spider-sense/target/
