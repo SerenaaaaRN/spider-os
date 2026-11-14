@@ -34,6 +34,7 @@
 //! ```
 
 use std::env;
+use std::cell::Cell;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -320,8 +321,17 @@ impl CpuSampler {
 ///
 /// Dengan demikian tidak ada `#[cfg(windows)]` di seluruh kode — jalur
 /// preview tetap satu kode dengan runtime produksi.
+///
+/// # Fitur preview: alternasi `stat.b`
+///
+/// Bila file `stat.b` ada di root, mode watch membaca `stat` dan `stat.b`
+/// bergantian sehingga delta CPU bergerak secara deterministik — memungkinkan
+/// simulasi beban di Windows. Di `/proc` asli file ini tidak pernah ada,
+/// sehingga runtime produksi selalu membaca `stat` tunggal.
 pub struct ProcFS {
     root: PathBuf,
+    /// Status giliran alternasi `stat`/`stat.b` (khusus fixture preview).
+    stat_alt: Cell<bool>,
 }
 
 impl ProcFS {
@@ -329,8 +339,8 @@ impl ProcFS {
     #[must_use]
     pub fn resolve() -> Self {
         match env::var("SPIDEROS_PROC_ROOT") {
-            Ok(p) if !p.is_empty() => Self { root: PathBuf::from(p) },
-            _ => Self { root: PathBuf::from("/proc") },
+            Ok(p) if !p.is_empty() => Self { root: PathBuf::from(p), stat_alt: Cell::new(false) },
+            _ => Self { root: PathBuf::from("/proc"), stat_alt: Cell::new(false) },
         }
     }
 
@@ -345,6 +355,16 @@ impl ProcFS {
         fs::read_to_string(self.root.join(name))
     }
 
+    /// Membaca sumber `/proc/stat` dengan alternasi `stat.b` bila tersedia.
+    fn read_stat(&self) -> io::Result<String> {
+        if self.root.join("stat.b").exists() {
+            let use_alt = !self.stat_alt.get();
+            self.stat_alt.set(!use_alt);
+            return self.read(if use_alt { "stat.b" } else { "stat" });
+        }
+        self.read("stat")
+    }
+
     /// Mengumpulkan satu [`SystemSample`] dari seluruh sumber `/proc`.
     ///
     /// Versi kernel dicoba dari `sys/kernel/osrelease` terlebih dahulu,
@@ -356,7 +376,7 @@ impl ProcFS {
     /// `cpuinfo`, `uptime`, `loadavg`) gagal dibaca; field pelengkap
     /// (osrelease, jumlah proses) ditoleransi kosong agar tidak panic.
     pub fn sample(&self) -> io::Result<SystemSample> {
-        let stat = self.read("stat")?;
+        let stat = self.read_stat()?;
         let meminfo = self.read("meminfo")?;
         let cpuinfo = self.read("cpuinfo")?;
         let uptime = self.read("uptime")?;
@@ -452,55 +472,124 @@ impl Renderer {
         render_bar(percent, BAR_WIDTH)
     }
 
-    /// Baris status berdasarkan metrik tertinggi (CPU atau RAM):
-    /// `< 40` Tenang, `40..=75` Waspada, `> 75` Bahaya.
-    fn status_line(&self, cpu_pct: f64, mem_pct: f64) -> String {
-        let peak = cpu_pct.max(mem_pct);
-        let (color, text) = if peak > 75.0 {
-            (self.color(RED), "BAHAYA! Spider-Sense berdenyut!")
-        } else if peak >= 40.0 {
-            (self.color(YELLOW), "Waspada")
-        } else {
-            (self.color(GREEN), "Tenang")
-        };
-        format!(" Status: {color}{text}{RESET}\n")
-    }
+/// ASCII art Debian diadaptasi persis dari proyek neofetch (MIT),
+/// dipakai karena SpiderOS adalah remaster Debian 13. Kredensial
+/// tercatat di `docs/credits.md`.
+const DEBIAN_ASCII: [&str; 17] = [
+    "      _,met$$$$$gg.      ",
+    "   ,g$$$$$$$$$$$$$$$P.   ",
+    "  ,g$$P\"     \"\"\"Y$$.\".  ",
+    " ,$$P'              `$$$. ",
+    ",$$P       ,ggs.     `$$b:",
+    "`d$$'     ,$P\"\"'   .    $$$",
+    " $$P      d$'     ,    $$P",
+    " $$:      $$.   -    ,d$$'",
+    " $$;      Y$b._   _,d$$$'",
+    " Y$$.    `.`\"Y$$$$P\"'    ",
+    " `$$b      \"-.__          ",
+    "  `Y$$                    ",
+    "   `Y$$.                  ",
+    "     `$$b.                ",
+    "       `Y$$b.             ",
+    "          `\"Y$b._         ",
+    "              `\"\"\"        ",
+];
 
-    /// Menyusun satu frame lengkap (header, CPU, RAM, kernel, uptime,
-    /// proses, load, status).
-    pub fn frame(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> String {
-        let (c_red, c_blue, c_reset) = (self.color(RED), self.color(BLUE), self.color(RESET));
-        let mut out = String::new();
-        out.push_str(&format!(
-            " {c_blue}🕷{c_reset} {c_red}Spider-Sense{c_reset} {c_blue}1.0.0{c_reset}\n"
-        ));
-        out.push_str(&format!(
-            " {c_red}CPU{c_reset}   [{c_blue}{}{c_reset}] {:.1}%\n",
-            self.bar(cpu_pct),
-            cpu_pct
-        ));
-        out.push_str(&format!(
-            " {c_red}RAM{c_reset}   [{c_blue}{}{c_reset}] {:.1}%\n",
-            self.bar(mem_pct),
-            mem_pct
-        ));
-        out.push_str(&format!(
-            " CPU   : {}\n",
-            if s.cpu_model.is_empty() { "N/A" } else { &s.cpu_model }
-        ));
-        out.push_str(&format!(
-            " Kernel: {}\n",
-            if s.kernel.is_empty() { "N/A" } else { &s.kernel }
-        ));
-        out.push_str(&format!(" Uptime: {}\n", format_uptime(s.uptime_secs)));
-        out.push_str(&format!(" Procs : {}\n", s.proc_count));
-        out.push_str(&format!(
-            " Load  : {:.2} {:.2} {:.2}\n",
-            s.load.0, s.load.1, s.load.2
-        ));
-        out.push_str(&self.status_line(cpu_pct, mem_pct));
-        out
+/// Menyusun satu frame ala neofetch: ASCII Debian di kiri, info sistem
+/// di kanan, ditutup blok warna tema SpiderOS.
+pub fn frame(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> String {
+    let mut out = String::new();
+    let info = self.info_lines(cpu_pct, mem_pct, s);
+    let mut info_iter = info.iter();
+    for art_line in Self::DEBIAN_ASCII.iter() {
+        let art = self.color_ascii(art_line);
+        match info_iter.next() {
+            Some(line) => out.push_str(&format!("  {:<28}{}\n", art, line)),
+            None => out.push_str(&format!("  {}\n", art)),
+        }
     }
+    for line in info_iter {
+        out.push_str(&format!("  {:<28}{}\n", "", line));
+    }
+    out
+}
+
+/// Pewarnaan dua-tone untuk art: karakter `$` biru (swirl), sisanya
+/// aksen merah — menegaskan tema SpiderOS di atas bentuk Debian.
+fn color_ascii(&self, line: &str) -> String {
+    if !self.colored {
+        return line.trim_end().to_string();
+    }
+    let mut out = String::new();
+    for c in line.chars() {
+        match c {
+            ' ' => out.push(c),
+            '$' => {
+                out.push_str(BLUE);
+                out.push(c);
+            }
+            _ => {
+                out.push_str(RED);
+                out.push(c);
+            }
+        }
+    }
+    out.push_str(RESET);
+    out
+}
+
+/// Susun baris-baris info ala neofetch (label + nilai, sejajar titik-dua).
+fn info_lines(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> Vec<String> {
+    let (c_red, c_blue, c_bold, c_reset) =
+        (self.color(RED), self.color(BLUE), self.color("\x1b[1m"), self.color(RESET));
+    let label = |name: &str| format!(" {c_bold}{name:<8}{c_reset}: ");
+    let user = env_user();
+    let host = env_host();
+
+    let mut v = Vec::new();
+    v.push(format!(" {c_red}{user}{c_reset}{c_blue}@{c_reset}{c_blue}{host}{c_reset}"));
+    v.push(format!(" {c_blue}----------------{c_reset}"));
+    v.push(format!("{}{}", label("OS"), "SpiderOS 1.0 (Debian 13)"));
+    v.push(format!("{}{}", label("Host"), host));
+    v.push(format!("{}{}", label("Kernel"), if s.kernel.is_empty() { "N/A" } else { &s.kernel }));
+    v.push(format!("{}{}", label("Uptime"), format_uptime(s.uptime_secs)));
+    v.push(format!("{}{}", label("Procs"), s.proc_count));
+    v.push(format!("{}{:.2}, {:.2}, {:.2}", label("Load"), s.load.0, s.load.1, s.load.2));
+    v.push(format!("{}{}", label("Shell"), env_shell()));
+    v.push(format!("{}{}", label("Terminal"), env_terminal()));
+    v.push(format!(" {}{:<8}{c_reset}[{c_blue}{}{c_reset}] {:.1}%", c_red, "CPU", self.bar(cpu_pct), cpu_pct));
+    v.push(format!(" {}{:<8}{c_reset}[{c_blue}{}{c_reset}] {:.1}%", c_red, "RAM", self.bar(mem_pct), mem_pct));
+    v.push(self.status_line(cpu_pct, mem_pct));
+    v.push(String::new());
+    v.push(self.color_blocks());
+    v
+}
+
+/// Baris status berdasarkan metrik tertinggi (CPU atau RAM):
+/// `< 40` Tenang, `40..=75` Waspada, `> 75` Bahaya.
+fn status_line(&self, cpu_pct: f64, mem_pct: f64) -> String {
+    let c_bold = self.color("\x1b[1m");
+    let c_reset = self.color(RESET);
+    let peak = cpu_pct.max(mem_pct);
+    let (color, text) = if peak > 75.0 {
+        (self.color(RED), "BAHAYA! Spider-Sense berdenyut!")
+    } else if peak >= 40.0 {
+        (self.color(YELLOW), "Waspada")
+    } else {
+        (self.color(GREEN), "Tenang")
+    };
+    format!(" {c_bold}Status{c_reset}  : {color}{text}{RESET}")
+}
+
+/// Blok warna tema ala neofetch: merah dan biru SpiderOS.
+fn color_blocks(&self) -> String {
+    if !self.colored {
+        return "███ ███ ███ ███ ███ ███".to_string();
+    }
+    let red = "███ ".repeat(3).trim_end().to_string();
+    let blue = "███ ".repeat(3).trim_end().to_string();
+    format!("{RED}{red}{RESET}  {BLUE}{blue}{RESET}")
+}
 
     /// Mempersiapkan layar untuk frame berikutnya pada mode watch:
     /// `ESC[2J` (hapus layar), `ESC[H` (kursor home), `ESC[?25l`
@@ -517,6 +606,40 @@ pub fn show_cursor() {
 }
 
 // === CLI =========================================================
+
+/// Nama user dari environment (POSIX: `USER`, fallback Windows: `USERNAME`).
+fn env_user() -> String {
+    env::var("USER")
+        .or_else(|_| env::var("USERNAME"))
+        .unwrap_or_else(|_| "spider".into())
+}
+
+/// Nama host dari environment (POSIX: `HOSTNAME`, fallback Windows: `COMPUTERNAME`).
+fn env_host() -> String {
+    env::var("HOSTNAME")
+        .or_else(|_| env::var("COMPUTERNAME"))
+        .unwrap_or_else(|_| "spideros".into())
+}
+
+/// Nama shell dari environment (`SHELL` di POSIX), tanpa path.
+fn env_shell() -> String {
+    env::var("SHELL")
+        .map(|p| {
+            Path::new(&p)
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or(&p)
+                .to_string()
+        })
+        .unwrap_or_else(|_| "unknown".into())
+}
+
+/// Nama terminal dari environment (`TERM` di POSIX, `TERM_PROGRAM` di Windows Terminal).
+fn env_terminal() -> String {
+    env::var("TERM")
+        .or_else(|_| env::var("TERM_PROGRAM"))
+        .unwrap_or_else(|_| "unknown".into())
+}
 
 const VERSION_LINE: &str = "spider-sense 1.0.0 (Rust, std-only)";
 const HELP_TEXT: &str = "\

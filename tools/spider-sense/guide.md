@@ -362,6 +362,8 @@ sudo chroot chroot /usr/local/bin/spider-sense --once --no-color
 6. **`--no-color`**: matikan warna, tapi clear screen di mode `--watch` TETAP aktif (ketentuan #9 modul).
 7. Error handling collector: **jangan panic** saat file tidak terbaca — tampilkan "N/A" agar program tetap jalan.
 8. Setelah selesai di Windows, lanjutkan ke Tahap F (tulis artefak integrasi) lalu Tahap G (eksekusi di VM). Catat progres di `docs/catatan.md`.
+9. **Renderer sudah gaya neofetch**: ASCII Debian (kredit di `docs/credits.md`) kiri, info sistem kanan, blok warna tema. Konsisten dengan identitas remaster Debian → SpiderOS.
+10. **Fitur preview `stat.b`**: bila `stat.b` ada di root fixture, `--watch` mengambil `stat`/`stat.b` bergantian sehingga CPU bergerak. Di `/proc` asli file ini tidak ada — runtime produksi tidak berubah.
 
 ---
 
