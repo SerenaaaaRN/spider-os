@@ -550,13 +550,13 @@ Snapshot: `P2-baseline-built`. Salin ISO ke Windows (lihat 1.5).
 
 ### 2.11 Checklist Phase 2
 
-- [ ] `auto/config`, paket list, `lb config` sukses
-- [ ] `auto/config` memakai `--distribution trixie` dan tidak ada referensi Debian 12
-- [ ] `sudo lb build` selesai tanpa error fatal
-- [ ] ISO ada, `file` menunjukkan hybrid, El Torito menunjukkan BIOS dan UEFI
-- [ ] `build.log` tersimpan, screenshot diambil
-- [ ] Commit Git dan snapshot dibuat
-- [ ] ISO sudah dipindah ke Windows
+- [x] `auto/config`, paket list, `lb config` sukses
+- [x] `auto/config` memakai `--distribution trixie` dan tidak ada referensi Debian 12
+- [x] `sudo lb build` selesai tanpa error fatal
+- [x] ISO ada, `file` menunjukkan hybrid, El Torito menunjukkan BIOS dan UEFI
+- [x] `build.log` tersimpan, screenshot diambil
+- [x] Commit Git dan snapshot dibuat
+- [x] ISO sudah dipindah ke Windows
 
 ✅ **Selesai kalau:** ISO baseline ada dan sudah ada di Windows siap diuji.
 
@@ -621,11 +621,11 @@ whoami        # spider
 ```
 
 Test fungsional:
-- [ ] Muncul desktop XFCE tanpa error
-- [ ] Terminal bisa dibuka
-- [ ] Internet jalan (`ping -c 3 deb.debian.org`)
-- [ ] Resolusi layar menyesuaikan jendela VM
-- [ ] Shutdown/reboot normal
+- [x] Muncul desktop XFCE tanpa error
+- [x] Terminal bisa dibuka
+- [x] Internet jalan (`ping -c 3 deb.debian.org`)
+- [x] Resolusi layar menyesuaikan jendela VM
+- [x] Shutdown/reboot normal
 
 📸 Screenshot: boot menu BIOS, boot menu UEFI, desktop, hasil `cat /proc/cmdline` → `P03-boot-bios-01.png`, `P03-boot-uefi-01.png`, `P03-desktop-01.png`.
 
@@ -641,10 +641,10 @@ Test fungsional:
 
 ### 3.5 Checklist Phase 3
 
-- [ ] Boot sukses di VM BIOS
-- [ ] Boot sukses di VM UEFI
-- [ ] Semua tes fungsional lulus
-- [ ] Screenshot tersimpan, hasil dicatat di `docs/catatan.md`
+- [x] Boot sukses di VM BIOS
+- [x] Boot sukses di VM UEFI
+- [x] Semua tes fungsional lulus
+- [x] Screenshot tersimpan, hasil dicatat di `docs/catatan.md`
 
 ✅ **Selesai kalau:** ISO baseline boot di kedua mode. Setelah ini baru boleh menambah tema. Ini juga titik di mana sekitar 70% risiko teknis sudah lewat.
 
