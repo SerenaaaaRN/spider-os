@@ -402,11 +402,16 @@ impl ProcFS {
 // === Renderer ANSI ===============================================
 
 const RED: &str = "\x1b[1;31m";
-const BLUE: &str = "\x1b[1;34m";
-const GREEN: &str = "\x1b[1;32m";
-const YELLOW: &str = "\x1b[1;33m";
 const RESET: &str = "\x1b[0m";
 const BAR_WIDTH: usize = 20;
+
+/// Palet lembut Spider-Sense — satu keluarga warna hangat, tanpa
+/// kombinasi merah-biru yang bentrok. Digunakan di seluruh renderer.
+const MAROON: &str = "\x1b[38;5;88m"; // maroon — identitas utama
+const ROSE: &str = "\x1b[38;5;174m"; // rose soft — aksen sekunder
+const CREAM: &str = "\x1b[38;5;223m"; // cream — nilai/teks hangat
+const SAND: &str = "\x1b[38;5;180m"; // sand — label
+const DUSK: &str = "\x1b[38;5;138m"; // dusk muted — underline/pemisah
 
 /// Menyiapkan terminal Windows agar memproses escape sequence ANSI.
 ///
@@ -472,93 +477,101 @@ impl Renderer {
         render_bar(percent, BAR_WIDTH)
     }
 
-/// ASCII art Debian diadaptasi persis dari proyek neofetch (MIT),
-/// dipakai karena SpiderOS adalah remaster Debian 13. Kredensial
-/// tercatat di `docs/credits.md`.
-const DEBIAN_ASCII: [&str; 17] = [
-    "      _,met$$$$$gg.      ",
-    "   ,g$$$$$$$$$$$$$$$P.   ",
-    "  ,g$$P\"     \"\"\"Y$$.\".  ",
-    " ,$$P'              `$$$. ",
-    ",$$P       ,ggs.     `$$b:",
-    "`d$$'     ,$P\"\"'   .    $$$",
-    " $$P      d$'     ,    $$P",
-    " $$:      $$.   -    ,d$$'",
-    " $$;      Y$b._   _,d$$$'",
-    " Y$$.    `.`\"Y$$$$P\"'    ",
-    " `$$b      \"-.__          ",
-    "  `Y$$                    ",
-    "   `Y$$.                  ",
-    "     `$$b.                ",
-    "       `Y$$b.             ",
-    "          `\"Y$b._         ",
-    "              `\"\"\"        ",
+/// Word art "SPIDEROS" — hasil generator ASCII art, identitas visual
+/// Spider-Sense di kolom kiri.
+const SPIDER_ART: [&str; 11] = [
+    r"$$$$$$\            $$\       $$\                     ",
+    r"$$  __$$\           \__|      $$ |                    ",
+    r"$$ /  \__| $$$$$$\  $$\  $$$$$$$ | $$$$$$\   $$$$$$\  ",
+    r"\$$$$$$\  $$  __$$\ $$ |$$  __$$ |$$  __$$\ $$  __$$\ ",
+    r" \____$$\ $$ /  $$ |$$ |$$ /  $$ |$$$$$$$$ |$$ |  \__|",
+    r"$$\   $$ |$$ |  $$ |$$ |$$ |  $$ |$$   ____|$$ |      ",
+    r"\$$$$$$  |$$$$$$$  |$$ |\$$$$$$$ |\$$$$$$$\ $$ |      ",
+    r" \______/ $$  ____/ \__| \_______| \_______|\__|      ",
+    r"          $$ |                                        ",
+    r"          $$ |                                        ",
+    r"          \__| ",
 ];
 
-/// Menyusun satu frame ala neofetch: ASCII Debian di kiri, info sistem
-/// di kanan, ditutup blok warna tema SpiderOS.
-pub fn frame(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> String {
-    let mut out = String::new();
-    let info = self.info_lines(cpu_pct, mem_pct, s);
-    let mut info_iter = info.iter();
-    for art_line in Self::DEBIAN_ASCII.iter() {
-        let art = self.color_ascii(art_line);
-        match info_iter.next() {
-            Some(line) => out.push_str(&format!("  {:<28}{}\n", art, line)),
-            None => out.push_str(&format!("  {}\n", art)),
+/// Panjang teks yang terlihat — mengabaikan escape sequence ANSI.
+///
+/// Padding kolom `format!` menghitung semua karakter termasuk kode
+/// warna yang invisible, sehingga menyebabkan kolom info molor.
+/// Fungsi ini menghitung hanya karakter yang benar-benar tampil.
+fn visible_width(text: &str) -> usize {
+    let mut count = 0;
+    let mut in_escape = false;
+    for c in text.chars() {
+        if in_escape {
+            if c.is_ascii_alphabetic() {
+                in_escape = false; // terminator sequence (mis. 'm' pada kode warna)
+            }
+        } else if c == '\x1b' {
+            in_escape = true;
+        } else {
+            count += 1;
         }
     }
-    for line in info_iter {
-        out.push_str(&format!("  {:<28}{}\n", "", line));
-    }
-    out
+    count
 }
 
-/// Pewarnaan dua-tone untuk art: karakter `$` biru (swirl), sisanya
-/// aksen merah — menegaskan tema SpiderOS di atas bentuk Debian.
-fn color_ascii(&self, line: &str) -> String {
-    if !self.colored {
-        return line.trim_end().to_string();
-    }
-    let mut out = String::new();
-    for c in line.chars() {
-        match c {
-            ' ' => out.push(c),
-            '$' => {
-                out.push_str(BLUE);
-                out.push(c);
-            }
-            _ => {
-                out.push_str(RED);
-                out.push(c);
-            }
+    /// Menyusun satu frame ala neofetch: word art di kiri, info sistem di
+    /// kanan; baris info yang melebihi art dilanjutkan dengan kolom kiri
+    /// kosong agar kolom kanan tetap sejajar.
+    ///
+    /// Tiap baris diakhiri `ESC[K` (hapus ke kanan) dan frame ditutup
+    /// `ESC[J` (hapus ke bawah) — kombinasi ini membuat mode watch bisa
+    /// menimpa frame sebelumnya tanpa clear penuh, sehingga tidak kedip.
+    pub fn frame(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> String {
+        let mut out = String::new();
+        let info = self.info_lines(cpu_pct, mem_pct, s);
+        let mut info_iter = info.iter();
+
+        let art_len = Self::SPIDER_ART.len();
+        let rows = art_len.max(info.len());
+        for i in 0..rows {
+            let left = if i < art_len {
+                format!("{}{}", self.color(MAROON), Self::SPIDER_ART[i])
+            } else {
+                String::new()
+            };
+            let pad = 55usize.saturating_sub(Self::visible_width(&left));
+            let line = match info_iter.next() {
+                Some(line) => line.clone(),
+                None => String::new(),
+            };
+            out.push_str(&format!("  {}{}{}{}\x1b[K\n", left, " ".repeat(pad), line, ""));
         }
+        out.push_str("\x1b[J");
+        out
     }
-    out.push_str(RESET);
-    out
-}
 
 /// Susun baris-baris info ala neofetch (label + nilai, sejajar titik-dua).
 fn info_lines(&self, cpu_pct: f64, mem_pct: f64, s: &SystemSample) -> Vec<String> {
-    let (c_red, c_blue, c_bold, c_reset) =
-        (self.color(RED), self.color(BLUE), self.color("\x1b[1m"), self.color(RESET));
-    let label = |name: &str| format!(" {c_bold}{name:<8}{c_reset}: ");
+    let (c_maroon, c_sand, c_cream, c_dusk, c_reset) = (
+        self.color(MAROON),
+        self.color(SAND),
+        self.color(CREAM),
+        self.color(DUSK),
+        self.color(RESET),
+    );
+    let label = |name: &str| format!(" {c_sand}{name:<8}{c_reset}: ");
     let user = env_user();
     let host = env_host();
 
     let mut v = Vec::new();
-    v.push(format!(" {c_red}{user}{c_reset}{c_blue}@{c_reset}{c_blue}{host}{c_reset}"));
-    v.push(format!(" {c_blue}----------------{c_reset}"));
-    v.push(format!("{}{}", label("OS"), "SpiderOS 1.0 (Debian 13)"));
-    v.push(format!("{}{}", label("Host"), host));
-    v.push(format!("{}{}", label("Kernel"), if s.kernel.is_empty() { "N/A" } else { &s.kernel }));
-    v.push(format!("{}{}", label("Uptime"), format_uptime(s.uptime_secs)));
-    v.push(format!("{}{}", label("Procs"), s.proc_count));
-    v.push(format!("{}{:.2}, {:.2}, {:.2}", label("Load"), s.load.0, s.load.1, s.load.2));
-    v.push(format!("{}{}", label("Shell"), env_shell()));
-    v.push(format!("{}{}", label("Terminal"), env_terminal()));
-    v.push(format!(" {}{:<8}{c_reset}[{c_blue}{}{c_reset}] {:.1}%", c_red, "CPU", self.bar(cpu_pct), cpu_pct));
-    v.push(format!(" {}{:<8}{c_reset}[{c_blue}{}{c_reset}] {:.1}%", c_red, "RAM", self.bar(mem_pct), mem_pct));
+    v.push(format!(" {c_maroon}{user}{c_reset}{c_dusk}@{c_reset}{c_sand}{host}{c_reset}"));
+    v.push(format!(" {c_dusk}----------------{c_reset}"));
+    v.push(format!("{}{c_cream}SpiderOS 1.0 (Debian 13){c_reset}", label("OS")));
+    v.push(format!("{}{c_cream}{host}{c_reset}", label("Host")));
+    v.push(format!("{}{c_cream}{}{c_reset}", label("Kernel"), if s.kernel.is_empty() { "N/A" } else { &s.kernel }));
+    v.push(format!("{}{c_cream}{}{c_reset}", label("Uptime"), format_uptime(s.uptime_secs)));
+    v.push(format!("{}{c_cream}{}{c_reset}", label("Procs"), s.proc_count));
+    v.push(format!("{}{c_cream}{:.2}, {:.2}, {:.2}{c_reset}", label("Load"), s.load.0, s.load.1, s.load.2));
+    v.push(format!("{}{c_cream}{}{c_reset}", label("Shell"), env_shell()));
+    v.push(format!("{}{c_cream}{}{c_reset}", label("Terminal"), env_terminal()));
+    v.push(format!(" {c_sand}{:<8}{c_reset}[{c_cream}{}{c_reset}] {:.1}%", "CPU", self.bar(cpu_pct), cpu_pct));
+    v.push(format!(" {c_sand}{:<8}{c_reset}[{c_cream}{}{c_reset}] {:.1}%", "RAM", self.bar(mem_pct), mem_pct));
     v.push(self.status_line(cpu_pct, mem_pct));
     v.push(String::new());
     v.push(self.color_blocks());
@@ -571,31 +584,60 @@ fn status_line(&self, cpu_pct: f64, mem_pct: f64) -> String {
     let c_bold = self.color("\x1b[1m");
     let c_reset = self.color(RESET);
     let peak = cpu_pct.max(mem_pct);
+    // Status tetap kontras tapi lembut: sage untuk tenang, amber untuk
+    // waspada, merah terang hanya untuk kondisi bahaya.
+    const SAGE: &str = "\x1b[38;5;108m";
+    const AMBER: &str = "\x1b[38;5;179m";
     let (color, text) = if peak > 75.0 {
         (self.color(RED), "BAHAYA! Spider-Sense berdenyut!")
     } else if peak >= 40.0 {
-        (self.color(YELLOW), "Waspada")
+        (self.color(AMBER), "Waspada")
     } else {
-        (self.color(GREEN), "Tenang")
+        (self.color(SAGE), "Tenang")
     };
     format!(" {c_bold}Status{c_reset}  : {color}{text}{RESET}")
 }
 
-/// Blok warna tema ala neofetch: merah dan biru SpiderOS.
+/// Blok warna palet lembut ala neofetch: maroon, rose, cream.
 fn color_blocks(&self) -> String {
     if !self.colored {
         return "███ ███ ███ ███ ███ ███".to_string();
     }
-    let red = "███ ".repeat(3).trim_end().to_string();
-    let blue = "███ ".repeat(3).trim_end().to_string();
-    format!("{RED}{red}{RESET}  {BLUE}{blue}{RESET}")
+    let maroon = "███ ".repeat(3).trim_end().to_string();
+    let rose = "███ ".repeat(3).trim_end().to_string();
+    let cream = "███ ".repeat(3).trim_end().to_string();
+    format!(
+        "{MAROON}{maroon}{RESET}  {ROSE}{rose}{RESET}  {CREAM}{cream}{RESET}"
+    )
 }
 
-    /// Mempersiapkan layar untuk frame berikutnya pada mode watch:
-    /// `ESC[2J` (hapus layar), `ESC[H` (kursor home), `ESC[?25l`
-    /// (sembunyikan kursor).
-    pub fn clear_screen(&self) {
-        print!("\x1b[2J\x1b[H\x1b[?25l");
+    /// Inisialisasi layar (dipanggil SEKALI di awal watch): clear penuh +
+    /// sembunyikan kursor. Frame berikutnya tidak perlu clear lagi.
+    pub fn init_screen(&self) {
+        print!("\x1b[2J\x1b[?25l");
+        let _ = io::stdout().flush();
+    }
+
+    /// Pindahkan kursor ke home tanpa menghapus layar — dipakai tiap
+    /// frame agar tidak ada momen layar kosong (anti-kedip).
+    pub fn home_cursor(&self) {
+        print!("\x1b[H");
+    }
+
+    /// Masuk alternate screen buffer (`ESC[?1049h`) pada mode watch.
+    ///
+    /// Tanpa ini, jejak frame lama tersimpan di scrollback terminal
+    /// dan muncul saat di-scroll. Dengan alternate screen — mekanisme
+    /// yang sama dipakai `htop` dan `vim` — frame hanya hidup di buffer
+    /// terpisah, dan layar asli terpulihkan penuh saat program keluar.
+    pub fn enter_alt_screen(&self) {
+        print!("\x1b[?1049h");
+        let _ = io::stdout().flush();
+    }
+
+    /// Keluar dari alternate screen dan pulihkan terminal.
+    pub fn leave_alt_screen(&self) {
+        print!("\x1b[?1049l");
     }
 }
 
@@ -722,24 +764,41 @@ fn run_watch(colored: bool) -> io::Result<()> {
     let mut sampler = CpuSampler::new();
     let renderer = Renderer::new(colored);
     sampler.usage(procfs.sample()?.cpu);
-    loop {
-        thread::sleep(Duration::from_secs(1));
-        let s = match procfs.sample() {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!(
-                    "spider-sense: gagal membaca {}: {e}",
-                    procfs.root().display()
-                );
-                continue;
-            }
-        };
-        let cpu_pct = sampler.usage(s.cpu).unwrap_or(0.0);
-        let mem_pct = mem_usage_percent(s.mem);
-        renderer.clear_screen();
-        print!("{}", renderer.frame(cpu_pct, mem_pct, &s));
-        io::stdout().flush()?;
-    }
+
+    // Alternate screen: frame hanya hidup di buffer terpisah, scrollback
+    // terminal tidak tercemar; layar asli terpulihkan saat keluar.
+    renderer.enter_alt_screen();
+    let result = (|| -> io::Result<()> {
+        // Clear penuh hanya di awal; frame berikutnya menimpa via
+        // home + ESC[K per baris sehingga tidak ada flash.
+        renderer.init_screen();
+        let s_first = procfs.sample()?;
+        loop {
+            let s = if sampler.prev.is_some() {
+                match procfs.sample() {
+                    Ok(s) => s,
+                    Err(e) => {
+                        eprintln!(
+                            "spider-sense: gagal membaca {}: {e}",
+                            procfs.root().display()
+                        );
+                        thread::sleep(Duration::from_secs(1));
+                        continue;
+                    }
+                }
+            } else {
+                s_first.clone()
+            };
+            let cpu_pct = sampler.usage(s.cpu).unwrap_or(0.0);
+            let mem_pct = mem_usage_percent(s.mem);
+            renderer.home_cursor();
+            print!("{}", renderer.frame(cpu_pct, mem_pct, &s));
+            io::stdout().flush()?;
+            thread::sleep(Duration::from_secs(1));
+        }
+    })();
+    renderer.leave_alt_screen();
+    result
 }
 
 /// Entry point: parsing argumen manual, lalu menjalankan mode `--watch`
@@ -769,8 +828,8 @@ fn main() {
         }
     }
 
-    show_cursor();
     let result = if watch { run_watch(colored) } else { run_once(colored) };
+    show_cursor();
     if let Err(e) = result {
         eprintln!("spider-sense: {e}");
         std::process::exit(1);
@@ -874,5 +933,13 @@ intr 1234567
     fn parse_uptime_membulatkan_ke_detik() {
         assert_eq!(parse_uptime("12753.42 98213.07"), Some(12_753));
         assert!(parse_uptime("bukan").is_none());
+    }
+
+    #[test]
+    fn visible_width_mengabaikan_kode_warna_ansi() {
+        assert_eq!(Renderer::visible_width("abc"), 3);
+        assert_eq!(Renderer::visible_width("\x1b[1;31mabc\x1b[0m"), 3);
+        assert_eq!(Renderer::visible_width("\x1b[38;5;88m█\x1b[0m"), 1);
+        assert_eq!(Renderer::visible_width(""), 0);
     }
 }
