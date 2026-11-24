@@ -132,14 +132,17 @@ Sudah diatur lewat `--bootappend-live` di `auto/config`. Penjelasan untuk lapora
 
 User `spider` otomatis masuk grup `sudo` tanpa password di sesi live (perilaku standar live-config). Auto-login desktop juga aktif. Kalau ingin layar login tampil (supaya login screen bertema bisa dipamerkan), tambahkan `nox11autologin` ke `--bootappend-live` (lalu login manual `spider` / `live`).
 
-### 5.5 Build dan uji
+### 5.5 Validasi tanpa build
+
+Build ISO ditunda sampai Phase 10 (satu build final). Yang dicek sekarang tanpa `lb build`:
 
 ```bash
 cd ~/spideros
-./scripts/build.sh v0.2
+apt-cache policy firefox-esr vlc ufw firmware-linux-nonfree
+bash -n config/hooks/live/0050-system-config.hook.chroot
 ```
 
-Salin ISO ke Windows, boot di VM test BIOS dan UEFI. Cek:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 
 ```bash
 # [TEST-VM]
@@ -162,7 +165,7 @@ Snapshot: `P5-packages-done`.
 
 ### 5.7 Checklist Phase 5
 
-- [ ] Paket lengkap terpasang, ISO v0.2 boot di BIOS dan UEFI
+- [ ] Paket lengkap terpasang; diverifikasi pada ISO final di Phase 10
 - [ ] Firefox, VLC, file manager, terminal jalan
 - [ ] `ufw` aktif
 - [ ] Ukuran ISO dicatat (target di bawah sekitar 2 GB)

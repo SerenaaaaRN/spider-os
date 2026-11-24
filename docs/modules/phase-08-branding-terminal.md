@@ -128,13 +128,11 @@ EOF
 
 Pemetaan 16 warna: 0 kanvas, 1 maroon, 2 sage, 3 amber, 4 dusk, 5 rose, 6 cream, 7 cream muda, 8 panel, 9 maroon terang, 10 sage terang, 11 amber terang, 12 sand, 13 rose terang, 14 cream terang, 15 putih hangat. Ini membuat warna `spider-sense` (88/174/223/180/138/108/179) tampil konsisten di terminal.
 
-### 8.5 Build dan uji
+### 8.5 Validasi tanpa build
 
-```bash
-./scripts/build.sh v0.5
-```
+Build ditunda sampai Phase 10. Periksa dulu file identitas, `terminalrc`, dan desktop entry di `config/includes.chroot_after_packages/`.
 
-Cek di `[TEST-VM]`:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 
 ```bash
 cat /etc/os-release | head -3

@@ -163,13 +163,15 @@ Layout panel XFCE disimpan di `xfce4-panel.xml`. Cara paling mudah mengubahnya:
 
 Kalau tidak sempat, lewati. Panel default sudah rapi.
 
-### 6.8 Build dan verifikasi
+### 6.8 Validasi tanpa build
+
+Build ditunda sampai Phase 10. Cek dulu bahwa aset sudah masuk ke staging:
 
 ```bash
-./scripts/build.sh v0.3
+ls config/includes.chroot_after_packages/usr/share/backgrounds/spiderman
 ```
 
-Cek di `[TEST-VM]`:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 - [ ] Wallpaper Spider-Man tampil
 - [ ] Tema jendela dan tombol berwarna maroon gelap
 - [ ] Ikon Papirus tampil

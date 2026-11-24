@@ -149,13 +149,16 @@ set menu_color_highlight=white/red
 
 Cari `timeout` di file cfg dan atur misalnya 5 detik.
 
-### 7.3 Build dan uji
+### 7.3 Validasi tanpa build
+
+Build ditunda sampai Phase 10. Cek dulu path boot loader hasil `lb config` dan sintaks hook:
 
 ```bash
-./scripts/build.sh v0.4
+ls config/bootloaders
+bash -n config/hooks/live/0200-plymouth.hook.chroot
 ```
 
-Uji di VM BIOS dan UEFI, lalu cek:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 - [ ] Menu BIOS bertema SpiderOS
 - [ ] Menu UEFI bertema SpiderOS
 - [ ] Animasi/logo Plymouth muncul saat loading

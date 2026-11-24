@@ -5,6 +5,8 @@
 
 ### 10.1 Build bersih dari nol
 
+Ini satu-satunya build penuh. Seluruh konfigurasi Phase 5–9 sudah disiapkan dan divalidasi tanpa build sebelum perintah ini dijalankan.
+
 ```bash
 cd ~/spideros
 sudo lb clean --purge

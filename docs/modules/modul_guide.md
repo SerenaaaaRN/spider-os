@@ -871,14 +871,17 @@ Sudah diatur lewat `--bootappend-live` di `auto/config`. Penjelasan untuk lapora
 
 User `spider` otomatis masuk grup `sudo` tanpa password di sesi live (perilaku standar live-config). Auto-login desktop juga aktif. Kalau ingin layar login tampil (supaya login screen bertema bisa dipamerkan), tambahkan `nox11autologin` ke `--bootappend-live` (lalu login manual `spider` / `live`).
 
-### 5.5 Build dan uji
+### 5.5 Validasi tanpa build
+
+Build ISO ditunda sampai Phase 10 (satu build final). Yang dicek sekarang tanpa `lb build`:
 
 ```bash
 cd ~/spideros
-./scripts/build.sh v0.2
+apt-cache policy firefox-esr vlc ufw firmware-linux-nonfree
+bash -n config/hooks/live/0050-system-config.hook.chroot
 ```
 
-Salin ISO ke Windows, boot di VM test BIOS dan UEFI. Cek:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 
 ```bash
 # [TEST-VM]
@@ -901,7 +904,7 @@ Snapshot: `P5-packages-done`.
 
 ### 5.7 Checklist Phase 5
 
-- [ ] Paket lengkap terpasang, ISO v0.2 boot di BIOS dan UEFI
+- [ ] Paket lengkap terpasang; diverifikasi pada ISO final di Phase 10
 - [ ] Firefox, VLC, file manager, terminal jalan
 - [ ] `ufw` aktif
 - [ ] Ukuran ISO dicatat (target di bawah sekitar 2 GB)
@@ -1076,13 +1079,15 @@ Layout panel XFCE disimpan di `xfce4-panel.xml`. Cara paling mudah mengubahnya:
 
 Kalau tidak sempat, lewati. Panel default sudah rapi.
 
-### 6.8 Build dan verifikasi
+### 6.8 Validasi tanpa build
+
+Build ditunda sampai Phase 10. Cek dulu bahwa aset sudah masuk ke staging:
 
 ```bash
-./scripts/build.sh v0.3
+ls config/includes.chroot_after_packages/usr/share/backgrounds/spiderman
 ```
 
-Cek di `[TEST-VM]`:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 - [ ] Wallpaper Spider-Man tampil
 - [ ] Tema jendela dan tombol berwarna maroon gelap
 - [ ] Ikon Papirus tampil
@@ -1280,13 +1285,16 @@ set menu_color_highlight=white/red
 
 Cari `timeout` di file cfg dan atur misalnya 5 detik.
 
-### 7.3 Build dan uji
+### 7.3 Validasi tanpa build
+
+Build ditunda sampai Phase 10. Cek dulu path boot loader hasil `lb config` dan sintaks hook:
 
 ```bash
-./scripts/build.sh v0.4
+ls config/bootloaders
+bash -n config/hooks/live/0200-plymouth.hook.chroot
 ```
 
-Uji di VM BIOS dan UEFI, lalu cek:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 - [ ] Menu BIOS bertema SpiderOS
 - [ ] Menu UEFI bertema SpiderOS
 - [ ] Animasi/logo Plymouth muncul saat loading
@@ -1454,13 +1462,11 @@ EOF
 
 Pemetaan 16 warna: 0 kanvas, 1 maroon, 2 sage, 3 amber, 4 dusk, 5 rose, 6 cream, 7 cream muda, 8 panel, 9 maroon terang, 10 sage terang, 11 amber terang, 12 sand, 13 rose terang, 14 cream terang, 15 putih hangat. Ini membuat warna `spider-sense` (88/174/223/180/138/108/179) tampil konsisten di terminal.
 
-### 8.5 Build dan uji
+### 8.5 Validasi tanpa build
 
-```bash
-./scripts/build.sh v0.5
-```
+Build ditunda sampai Phase 10. Periksa dulu file identitas, `terminalrc`, dan desktop entry di `config/includes.chroot_after_packages/`.
 
-Cek di `[TEST-VM]`:
+Daftar di bawah diverifikasi di `[TEST-VM]` setelah build final:
 
 ```bash
 cat /etc/os-release | head -3
@@ -1750,7 +1756,7 @@ rm -rf /var/lib/apt/lists/*
 3. Buat hook `0400` dan pastikan executable.
 4. Panggil `./scripts/stage-spider-sense.sh` di `scripts/build.sh` tepat setelah `cd "$(dirname "$0")/.."`.
 5. Buat desktop entry.
-6. Build dengan `./scripts/build.sh v0.6`.
+6. Build dilakukan sekali di Phase 10 dengan `./scripts/build.sh v1.0-rc1`; hook `0400` baru teruji saat build itu.
 7. Verifikasi di chroot: binary ELF, smoke test, dan `cargo`/`rustc` sudah tidak ada.
 
 ### 9.7 Verifikasi di ISO
@@ -1958,6 +1964,8 @@ EOF
 **Output:** `spideros-v1.0-rc1.iso`, checksum, tabel hasil uji, data performa untuk laporan.
 
 ### 10.1 Build bersih dari nol
+
+Ini satu-satunya build penuh. Seluruh konfigurasi Phase 5–9 sudah disiapkan dan divalidasi tanpa build sebelum perintah ini dijalankan.
 
 ```bash
 cd ~/spideros

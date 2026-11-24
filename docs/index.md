@@ -45,6 +45,7 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 - Baca indeks ini dulu, lalu buka hanya file phase yang sedang dikerjakan.
 - `modules/modul_guide.md` adalah versi gabungan dari semua file di atas. Dihasilkan oleh `scripts/generate-modul.py`; tidak diedit langsung.
 - Setelah mengubah file phase, jalankan `python scripts/generate-modul.py` untuk memperbarui versi gabungan.
+- Strategi build: **satu build final `v1.0-rc1` di Phase 10**. Phase 5–9 hanya menyiapkan dan memvalidasi konfigurasi, tanpa build per phase.
 
 ## Alur sinkronisasi Windows ↔ VM
 

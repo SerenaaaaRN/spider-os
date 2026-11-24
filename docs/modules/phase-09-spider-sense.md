@@ -246,7 +246,7 @@ rm -rf /var/lib/apt/lists/*
 3. Buat hook `0400` dan pastikan executable.
 4. Panggil `./scripts/stage-spider-sense.sh` di `scripts/build.sh` tepat setelah `cd "$(dirname "$0")/.."`.
 5. Buat desktop entry.
-6. Build dengan `./scripts/build.sh v0.6`.
+6. Build dilakukan sekali di Phase 10 dengan `./scripts/build.sh v1.0-rc1`; hook `0400` baru teruji saat build itu.
 7. Verifikasi di chroot: binary ELF, smoke test, dan `cargo`/`rustc` sudah tidak ada.
 
 ### 9.7 Verifikasi di ISO
