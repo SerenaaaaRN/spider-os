@@ -10,7 +10,7 @@ OUT = MOD / "modul_guide.md"
 
 HEADER = (
     "> Versi gabungan dari seluruh file phase di `docs/modules/`. "
-    "Dihasilkan otomatis oleh `scripts/generate-module`; "
+    "Dihasilkan otomatis oleh `scripts/generate-modul.py`; "
     "sumber kebenaran ada di file-file phase. Untuk navigasi, lihat `docs/index.md`.\n\n"
 )
 

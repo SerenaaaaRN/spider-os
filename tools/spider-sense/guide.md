@@ -38,7 +38,7 @@
 **Kesimpulan penting:**
 
 - Binary Rust yang di-build di Windows **TIDAK dipakai di ISO**. Format binary Windows (PE) tidak jalan di Linux (ELF).
-- Yang masuk ISO hanyalah **source code** (`Cargo.toml`, `Cargo.lock`, `src/main.rs`, `tests/`), lalu dikompilasi ULANG di chroot Debian via hook `0400`.
+- Yang masuk ISO hanyalah **source code** (`Cargo.toml`, `Cargo.lock`, `src/*.rs`, `tests/`), lalu dikompilasi ULANG di chroot Debian via hook `0400`.
 - Peran Windows: penulisan kode + pengujian logika + preview UI.
 - Peran VM: kompilasi final + integrasi ISO + pengujian `/proc` asli.
 
@@ -166,7 +166,7 @@ Progress bar: blok karakter `█` dan `░`, jumlah proporsional dengan persenta
 
 ---
 
-## 6. Arsitektur `src/main.rs` (sesuai Modul 9.2)
+## 6. Arsitektur modul (sesuai Modul 9.2)
 
 ```
 tools/spider-sense/
@@ -176,19 +176,30 @@ tools/spider-sense/
 ├── Cargo.lock          # WAJIB di-commit (hook pakai --locked)
 ├── guide.md            # dokumen ini
 ├── src/
-│   └── main.rs         # 5 bagian: CLI, parser, sampler, collector, renderer, unit test
+│   ├── main.rs         # entry point + orkestrasi --once / --watch + unit test
+│   ├── cli.rs          # --once, --watch, --no-color, --help, --version, identitas host
+│   ├── model.rs        # struktur data metrik & level bahaya
+│   ├── procfs.rs       # akses path /proc (bisa diganti via SPIDEROS_PROC_ROOT)
+│   ├── parser.rs       # parsing manual cpuinfo, stat, meminfo, uptime, loadavg
+│   ├── sampler.rs      # sampel idle/total sebelumnya → delta CPU
+│   ├── metrics.rs      # pengumpul metrik & perhitungan persentase
+│   └── render/
+│       ├── mod.rs      # frame builder, progress bar, layout neofetch-style
+│       ├── ansi.rs     # konstanta warna kanonik (sumber kebenaran palet)
+│       ├── art.rs      # ASCII art SpiderOS
+│       └── term.rs     # escape sequence: clear screen, hide cursor, alternate screen
 └── tests/
     └── fixtures/proc/  # fixture data (di-commit)
 ```
 
-| Bagian | Tanggung jawab |
+| Modul | Tanggung jawab |
 |---|---|
-| CLI | Parsing argumen `--once`, `--watch` (default), `--no-color`, `--help`, `--version` |
-| Parser `/proc` | Fungsi murni: teks → struktur data, tidak baca file langsung |
-| Sampler CPU | Simpan sampel `idle`/`total` sebelumnya, hitung delta |
-| Collector | Baca semua file via `ProcFS`, hitung jumlah folder PID, error ditangani rapi (jangan panic, tampil "N/A") |
-| Renderer ANSI | Frame builder, progress bar, warna, clear screen |
-| Unit test | Minimal 5 test: parser stat, parser meminfo, persen memori, delta CPU, clamp progress bar, format uptime |
+| `cli.rs` | Parsing argumen `--once`, `--watch` (default), `--no-color`, `--help`, `--version` |
+| `parser.rs` | Fungsi murni: teks → struktur data, tidak baca file langsung |
+| `sampler.rs` | Simpan sampel `idle`/`total` sebelumnya, hitung delta |
+| `metrics.rs` | Baca semua file via `ProcFS`, hitung jumlah folder PID, error ditangani rapi (jangan panic, tampil "N/A") |
+| `render/` | Frame builder, progress bar, warna, clear screen, alternate screen anti-flicker |
+| Unit test | 13 test: `parser.rs` (7), `metrics.rs` (4), `sampler.rs` (1), `render/mod.rs` (1) |
 
 **`--version` HARUS persis:** `spider-sense 1.0.0 (Rust, std-only)` — diminta di verifikasi Modul 9.7.
 
@@ -238,7 +249,7 @@ tools/spider-sense/
   .\target\release\spider-sense.exe --version
   ```
 - [ ] Uji varian fixture (CPU rendah vs tinggi) → status berubah
-- [ ] Commit: `Cargo.toml`, `Cargo.lock`, `src/main.rs`, `tests/`
+- [x] Commit: `Cargo.toml`, `Cargo.lock`, `src/*.rs`, `tests/` (sudah masuk commit `1d39972`)
   ```bash
   git add tools/spider-sense
   git commit -m "feat: spider-sense rust std-only (windows dev, unit test lulus)"
@@ -336,9 +347,9 @@ sudo chroot chroot /usr/local/bin/spider-sense --once --no-color
 
 ## 11. Checklist Akhir Phase 9 (dari Modul 9.9)
 
-- [ ] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, `src/main.rs`
-- [ ] Tidak ada dependency eksternal; hanya `std`
-- [ ] `cargo test` lulus (minimal 5 unit test)
+- [x] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan 11 file di `src/`
+- [x] Tidak ada dependency eksternal; hanya `std`
+- [x] `cargo test` lulus (13 unit test, dijalankan di Windows dengan fixture)
 - [ ] `cargo build --release --locked` sukses
 - [ ] `--once` dan `--watch` berjalan (preview di Windows dengan fixture → runtime asli di VM)
 - [ ] `0400-spider-sense-build.hook.chroot` ada dan executable

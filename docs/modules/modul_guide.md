@@ -1,4 +1,4 @@
-> Versi gabungan dari seluruh file phase di `docs/modules/`. Dihasilkan otomatis oleh `scripts/generate-module`; sumber kebenaran ada di file-file phase. Untuk navigasi, lihat `docs/index.md`.
+> Versi gabungan dari seluruh file phase di `docs/modules/`. Dihasilkan otomatis oleh `scripts/generate-modul.py`; sumber kebenaran ada di file-file phase. Untuk navigasi, lihat `docs/index.md`.
 
 ## 0. Pengantar
 
@@ -1558,17 +1558,30 @@ Proyek Rust disimpan di `tools/spider-sense/` dan menjadi sumber kebenaran (cano
 tools/spider-sense/
 ├── Cargo.toml          # metadata, profile release, tanpa dependencies
 ├── Cargo.lock          # dikunci untuk build reproducible
-└── src/
-    └── main.rs         # CLI, parser /proc, sampler CPU, renderer ANSI, unit test
+├── guide.md            # catatan pengembangan Phase 9
+├── src/
+│   ├── main.rs         # entry point + orkestrasi --once / --watch
+│   ├── cli.rs          # argumen CLI dan identitas lingkungan
+│   ├── model.rs        # struktur metrik dan level bahaya
+│   ├── procfs.rs       # akses /proc (path bisa diganti lewat SPIDEROS_PROC_ROOT)
+│   ├── parser.rs       # parsing manual cpuinfo, stat, meminfo, uptime, loadavg
+│   ├── sampler.rs      # sampel idle/total dan delta CPU
+│   ├── metrics.rs      # pengumpul metrik dan persentase
+│   └── render/
+│       ├── mod.rs      # frame builder, progress bar, layout
+│       ├── ansi.rs     # konstanta warna kanonik (sumber kebenaran palet)
+│       ├── art.rs      # ASCII art SpiderOS
+│       └── term.rs     # escape sequence, alternate screen anti-flicker
+└── tests/fixtures/proc/  # data fixture untuk pengujian di Windows
 ```
 
-Struktur `main.rs` dibagi menjadi lima bagian agar mudah dijelaskan di laporan:
+Kode dibagi menjadi beberapa modul agar mudah dijelaskan di laporan:
 
-1. **CLI** — `--once`, `--watch`, `--no-color`, `--help`, `--version`.
-2. **Parser `/proc`** — fungsi murni yang menerima teks dan mengembalikan struktur data.
-3. **Sampler CPU** — menyimpan sampel sebelumnya dan menghitung delta.
-4. **Renderer ANSI** — menyusun frame, progress bar, dan warna.
-5. **Unit test** — menguji parser, perhitungan persentase, bar, dan format uptime.
+1. **CLI** (`cli.rs`) — `--once`, `--watch`, `--no-color`, `--help`, `--version`.
+2. **Parser `/proc`** (`parser.rs`) — fungsi murni yang menerima teks dan mengembalikan struktur data.
+3. **Sampler CPU** (`sampler.rs`) — menyimpan sampel sebelumnya dan menghitung delta.
+4. **Renderer ANSI** (`render/`) — menyusun frame, progress bar, warna, dan kontrol layar.
+5. **Unit test** — 13 test: `parser.rs` (7), `metrics.rs` (4), `sampler.rs` (1), dan `render/mod.rs` (1).
 
 Saat build, sumber disalin sementara ke `config/includes.chroot_after_packages/opt/spider-sense-src/` agar dapat diakses hook di dalam chroot. Direktori staging ini bersifat generated dan tidak di-commit; sumber asli tetap di `tools/spider-sense/`.
 
@@ -1603,7 +1616,7 @@ Profile release dipakai agar binary kecil dan cepat. Setelah build pertama, `Car
 
 ### 9.4 Panduan implementasi Spider-Sense
 
-Tidak ada kode program yang disediakan di modul ini. Implementasi ditulis sendiri di `src/main.rs` dengan mengikuti spesifikasi berikut.
+Implementasi sudah ada di `tools/spider-sense/src/` dan mengikuti spesifikasi berikut. Bagian ini dipakai untuk menjelaskan keputusan desain kode di laporan.
 
 **Struktur yang disarankan** (boleh satu file, boleh dipecah menjadi modul):
 
@@ -1649,10 +1662,20 @@ cargo build --release --locked
 
 Yang diharapkan:
 
-- `cargo test` menjalankan 5 unit test dan semuanya lulus.
+- `cargo test` menjalankan 13 unit test dan semuanya lulus.
 - `cargo build --release --locked` menghasilkan `target/release/spider-sense`.
 - `--once --no-color` menampilkan satu frame metrik tanpa escape sequence warna.
 - `--watch` menampilkan layar yang diperbarui setiap detik.
+
+Di Windows, jalankan preview memakai fixture tanpa `/proc` asli:
+
+```powershell
+$env:SPIDEROS_PROC_ROOT = "tests\fixtures\proc"
+.\target\release\spider-sense.exe --once --no-color
+.\target\release\spider-sense.exe --watch
+```
+
+Environment `SPIDEROS_PROC_ROOT` hanya dipakai untuk pengujian. Di VM Debian, variabel ini tidak diset supaya program membaca `/proc` sungguhan.
 
 Uji beban agar status berubah:
 
@@ -1675,15 +1698,52 @@ git commit -m "feat: spider-sense rust std-only"
 
 Binary tidak dibangun di host lalu disalin. Proyek Rust disalin sementara ke chroot, dikompilasi oleh hook `0400-spider-sense-build.hook.chroot`, lalu toolchain build dibersihkan agar tidak ikut ke ISO. Pola ini menunjukkan pengelolaan build pipeline yang reproducible dan sesuai arsitektur target.
 
-**File yang perlu dibuat:**
+**File integrasi:**
 
-| File | Isi/tanggung jawab |
-|---|---|
-| `config/package-lists/spider-sense-build.list.chroot` | `cargo`, `rustc`, `build-essential` (build-only). |
-| `scripts/stage-spider-sense.sh` | Menyalin `tools/spider-sense/` ke `config/includes.chroot_after_packages/opt/spider-sense-src/`, mengecualikan `target/` dan `.git/`. |
-| `config/hooks/live/0400-spider-sense-build.hook.chroot` | Validasi source, `cargo build --release --locked --offline`, install binary ke `/usr/local/bin/spider-sense`, strip, smoke test `--once --no-color`, hapus source/target, purge paket build-only, apt clean. |
-| `config/includes.chroot_after_packages/usr/share/applications/spider-sense.desktop` | Desktop entry dengan `Exec=xfce4-terminal --hold -e spider-sense`. |
-| `.gitignore` | Tambahkan `config/includes.chroot_after_packages/opt/spider-sense-src/`. |
+| File | Isi/tanggung jawab | Status di repo |
+|---|---|---|
+| `config/package-lists/spider-sense-build.list.chroot` | `cargo`, `rustc`, `build-essential` (build-only). | Sudah ada |
+| `scripts/stage-spider-sense.sh` | Menyalin `tools/spider-sense/` ke `config/includes.chroot_after_packages/opt/spider-sense-src/`, mengecualikan `target/` dan `.git/`. | Sudah ada, executable |
+| `config/hooks/live/0400-spider-sense-build.hook.chroot` | Validasi source, `cargo build --release --locked --offline`, install binary ke `/usr/local/bin/spider-sense`, strip, smoke test, hapus source/target, purge paket build-only, apt clean. | Dibuat di VM (`config/hooks/` di-ignore); isi di bawah |
+| `config/includes.chroot_after_packages/usr/share/applications/spider-sense.desktop` | Desktop entry dengan `Exec=xfce4-terminal --hold -e spider-sense`. | Sudah ada |
+| `.gitignore` | Sudah memuat `config/includes.chroot_after_packages/opt/spider-sense-src/`. | Sudah ada |
+
+Isi hook `0400` — simpan di VM sebagai `config/hooks/live/0400-spider-sense-build.hook.chroot`, lalu `chmod +x`:
+
+```bash
+#!/bin/bash
+# Kompilasi Spider-Sense di dalam chroot, lalu bersihkan toolchain build.
+set -e
+
+SRC=/opt/spider-sense-src
+BIN=/usr/local/bin/spider-sense
+
+if [ ! -f "$SRC/Cargo.toml" ]; then
+    echo "ERROR: sumber Rust tidak ditemukan di $SRC" >&2
+    exit 1
+fi
+
+cd "$SRC"
+cargo build --release --locked --offline
+install -m 0755 target/release/spider-sense "$BIN"
+strip "$BIN" || true
+
+# Smoke test ringan selalu jalan; --once butuh /proc yang ter-mount di chroot.
+"$BIN" --version
+if [ -d /proc/self ]; then
+    "$BIN" --once --no-color
+else
+    echo "INFO: /proc tidak tersedia di chroot; smoke test --once dilewati"
+fi
+
+cd /
+rm -rf "$SRC"
+
+# Toolchain hanya dipakai saat build, jangan ikut ke ISO.
+apt-get purge -y --auto-remove cargo rustc build-essential || true
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+```
 
 **Urutan kerja:**
 
@@ -1733,13 +1793,14 @@ Yang diharapkan:
 
 ### 9.9 Checklist Phase 9
 
-- [ ] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan `src/main.rs`
-- [ ] Tidak ada dependency eksternal; hanya `std`
-- [ ] `cargo test` lulus (5 unit test)
-- [ ] `cargo build --release --locked` sukses
-- [ ] `--once` dan `--watch` berjalan di build-VM
-- [ ] `0400-spider-sense-build.hook.chroot` ada dan executable
-- [ ] `spider-sense-build.list.chroot` dan `scripts/stage-spider-sense.sh` ada
+- [x] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan 11 file di `src/`
+- [x] Tidak ada dependency eksternal; hanya `std`
+- [x] `cargo test` lulus (13 unit test)
+- [x] `cargo build --release --locked` sukses
+- [x] `--once` dan `--watch` berjalan dengan fixture di Windows
+- [x] `spider-sense-build.list.chroot`, `scripts/stage-spider-sense.sh`, dan desktop entry ada
+- [ ] `--once` dan `--watch` berjalan di build-VM dengan `/proc` asli
+- [ ] `0400-spider-sense-build.hook.chroot` dibuat di VM dan executable
 - [ ] Binary berada di `/usr/local/bin/spider-sense` di dalam chroot
 - [ ] `cargo` dan `rustc` tidak ikut ke ISO final
 - [ ] Tim dapat menjelaskan alur parser, sampler, renderer ANSI, dan hook build

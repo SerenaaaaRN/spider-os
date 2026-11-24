@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Spider-Sense
+Comment=Monitor sistem SpiderOS (Rust, std-only)
+Exec=xfce4-terminal --hold -e spider-sense
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;Monitor;

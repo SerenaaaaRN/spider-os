@@ -121,6 +121,6 @@ Logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Aset di proyek
 - [~] Aset nomor 1–7 ada dan sesuai ukuran — **masih dummy**, lihat §4.
 - [x] File sumber `.svg` tersimpan di `assets-src/`.
 - [x] `docs/credits.md` terisi.
-- [~] Commit Git — menyusul setelah generator dijalankan.
+- [x] Commit Git — `1d39972` sudah dibuat dan disinkronkan ke `origin/main`.
 
 ✅ **Selesai benar-benar kalau:** semua kotak §4 tercentang, yaitu aset dummy sudah diganti dengan aset final sebelum build Phase 6. 🕷️

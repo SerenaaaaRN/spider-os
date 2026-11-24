@@ -1,0 +1,5 @@
+# Build-only: dipakai hook 0400 untuk mengompilasi Spider-Sense di chroot.
+# Semua paket di sini di-purge lagi oleh hook sebelum ISO final.
+cargo
+rustc
+build-essential

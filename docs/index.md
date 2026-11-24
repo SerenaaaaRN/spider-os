@@ -28,7 +28,7 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 6 — Tema desktop | [`modules/phase-06-tema-desktop.md`](modules/phase-06-tema-desktop.md) | ⬜ Belum |
 | Phase 7 — Branding boot (Plymouth, boot menu) | [`modules/phase-07-branding-boot.md`](modules/phase-07-branding-boot.md) | ⬜ Belum |
 | Phase 8 — Branding terminal dan identitas | [`modules/phase-08-branding-terminal.md`](modules/phase-08-branding-terminal.md) | ⬜ Belum |
-| Phase 9 — Spider-Sense (Rust) | [`modules/phase-09-spider-sense.md`](modules/phase-09-spider-sense.md) | ⚠️ Kode Rust ✅, integrasi ISO belum |
+| Phase 9 — Spider-Sense (Rust) | [`modules/phase-09-spider-sense.md`](modules/phase-09-spider-sense.md) | ⚠️ Kode + file integrasi ✅, build chroot belum |
 | Phase 9.5 — Kolektor komik (YACReader) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ⬜ Belum |
 | Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ⬜ Belum |
 | Phase 10 — ISO v1 rc dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ⬜ Belum |
