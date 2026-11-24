@@ -3,7 +3,7 @@
 > **Dokumen ini adalah panduan lengkap pengembangan Spider-Sense (Phase 9) yang dikembangkan di Windows terlebih dahulu, lalu dikompilasi final di dalam chroot Debian pada build-VM.**
 > Dibuat sebagai dokumentasi alur agar agent/developer berikutnya bisa melanjutkan tanpa kehilangan konteks.
 >
-> Referensi utama: `docs/modules/modul_guide.md` → Phase 9.
+> Referensi utama: `docs/modules/phase-09-spider-sense.md`. Navigasi: `docs/index.md`.
 > Status progres pengerjaan: lihat `docs/catatan.md`.
 
 ---

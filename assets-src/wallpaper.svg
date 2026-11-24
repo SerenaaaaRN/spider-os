@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DUMMY ASSET — ganti sebelum build Phase 6. Palet: lihat docs/desain.md -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#17100F"/>
+      <stop offset="45%" stop-color="#4A0B0B"/>
+      <stop offset="100%" stop-color="#870000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#D78787" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#D78787" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#grad)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <g stroke="#AF8787" stroke-width="3" fill="none" opacity="0.55">
+    <circle cx="960" cy="440" r="120"/>
+    <circle cx="960" cy="440" r="240"/>
+    <circle cx="960" cy="440" r="360"/>
+    <circle cx="960" cy="440" r="480"/>
+    <circle cx="960" cy="440" r="600"/>
+    <path d="M960 -120 V1000 M400 440 H1520 M540 20 L1380 860 M1380 20 L540 860"/>
+    <path d="M960 -120 L1080 40 M960 -120 L840 40 M960 1000 L1080 840 M960 1000 L840 840"/>
+    <path d="M400 440 L560 320 M400 440 L560 560 M1520 440 L1360 320 M1520 440 L1360 560"/>
+  </g>
+  <g fill="#17100F" opacity="0.92">
+    <path d="M0 1080 V880 H120 V820 H220 V900 H340 V780 H430 V860 H560 V740 H660 V900 H800 V800 H920 V920 H1060 V760 H1180 V860 H1320 V800 H1450 V890 H1580 V780 H1700 V860 H1820 V820 H1920 V1080 Z"/>
+  </g>
+  <g fill="#D78787" opacity="0.75">
+    <rect x="140" y="850" width="12" height="20"/><rect x="250" y="840" width="12" height="20"/>
+    <rect x="370" y="810" width="12" height="20"/><rect x="690" y="770" width="12" height="20"/>
+    <rect x="1090" y="790" width="12" height="20"/><rect x="1330" y="830" width="12" height="20"/>
+    <rect x="1610" y="810" width="12" height="20"/><rect x="1850" y="850" width="12" height="20"/>
+  </g>
+  <text x="960" y="480" fill="#FFD7AF" font-family="sans-serif" font-size="120" font-weight="bold" text-anchor="middle" letter-spacing="14">SPIDEROS</text>
+  <text x="960" y="550" fill="#D7AF87" font-family="sans-serif" font-size="34" text-anchor="middle" letter-spacing="8">DENGAN KEKUATAN BESAR DATANG TANGGUNG JAWAB BESAR</text>
+</svg>

@@ -1,8 +1,4 @@
-# 🕷️ SpiderOS: Modul End-to-End Remastering Debian 13 Trixie dengan live-build
-
-Modul praktik lengkap dari nol sampai ISO jadi, diuji di USB asli, dan siap dilaporkan. Tema: Spider-Man. Basis: **Debian 13 (trixie)**. Tool utama: **live-build**. Desktop: **XFCE 4.20**. Komponen koding inti: **Rust (Spider-Sense)**.
-
----
+> Versi gabungan dari seluruh file phase di `docs/modules/`. Dihasilkan otomatis oleh `scripts/generate-module`; sumber kebenaran ada di file-file phase. Untuk navigasi, lihat `docs/index.md`.
 
 ## 0. Pengantar
 
@@ -608,7 +604,7 @@ Nyalakan tiap VM. Yang akan terlihat:
 
 | Mode | Boot menu | Pilih |
 |---|---|---|
-| BIOS | Menu ISOLINUX/Syslinux (biru, gaya lama) | Live system |
+| BIOS | Menu ISOLINUX/Syslinux (gaya lama) | Live system |
 | UEFI | Menu GRUB (hitam) | Live system |
 
 Setelah masuk desktop (auto-login), cek di terminal:
@@ -666,12 +662,12 @@ Putuskan dulu dan tulis di `docs/desain.md`:
 | Elemen | Contoh keputusan |
 |---|---|
 | Nama distro | SpiderOS (boleh diganti, asal konsisten) |
-| Palet utama | Merah `#E23636`, Biru tua `#1D3E91`, Biru sangat tua `#0A1E5E`, Hitam `#0B0C10`, Putih `#F5F5F5` |
+| Palet utama | Maroon `#870000` (identitas), Rose `#D78787`, Cream `#FFD7AF`, Sand `#D7AF87`, Dusk `#AF8787`; kanvas gelap `#17100F`. Sumber kebenaran: palet ANSI Spider-Sense di `tools/spider-sense/src/render/ansi.rs` |
 | Motif | Jaring laba-laba, siluet kota, garis diagonal |
 | Gaya logo | Emblem laba-laba bergaya sendiri (bukan logo resmi) |
 | Font | Satu sans-serif, misal Noto Sans |
 
-Hak cipta: logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Buat desain sendiri bergaya Spider-Man (siluet, motif jaring, palet merah-biru). Jika memakai aset luar, pilih yang lisensinya bebas (CC0 atau CC-BY), lalu catat sumber dan lisensinya di `docs/credits.md`. Tulis di laporan bahwa proyek ini untuk keperluan edukasi non-komersial.
+Hak cipta: logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Buat desain sendiri bergaya Spider-Man (siluet, motif jaring, palet hangat maroon–cream yang sama dengan Spider-Sense). Jika memakai aset luar, pilih yang lisensinya bebas (CC0 atau CC-BY), lalu catat sumber dan lisensinya di `docs/credits.md`. Tulis di laporan bahwa proyek ini untuk keperluan edukasi non-komersial.
 
 ### 4.2 Daftar aset dan spesifikasi
 
@@ -692,7 +688,7 @@ Hak cipta: logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Bua
 - **GIMP** untuk wallpaper dan efek (simpan `.xcf` di `assets-src/`).
 - Ekspor final ke `assets-final/`.
 
-Tips wallpaper yang aman: gradient merah ke biru gelap, motif jaring dari garis-garis radial dan lingkaran konsentris, siluet gedung di bawah, logo di tengah atau pojok.
+Tips wallpaper yang aman: gradient maroon gelap ke dusk/sand hangat di atas kanvas `#17100F`, motif jaring dari garis-garis radial dan lingkaran konsentris, siluet gedung di bawah, logo di tengah atau pojok. Hindari biru: palet ini mengikuti keluarga hangat Spider-Sense.
 
 ### 4.4 Konversi dan optimasi dengan ImageMagick
 
@@ -918,7 +914,7 @@ Snapshot: `P5-packages-done`.
 ## PHASE 6: Tema Desktop (Wallpaper, GTK, Ikon, Login Screen)
 
 **Tujuan:** tampilan desktop benar-benar bertema Spider-Man.
-**Output:** desktop dengan wallpaper, tema warna merah-biru, ikon, dan login screen khusus.
+**Output:** desktop dengan wallpaper, tema warna hangat (maroon/cream), ikon, dan login screen khusus.
 
 ### 6.1 Konsep: bagaimana file masuk ke ISO
 
@@ -945,6 +941,8 @@ mkdir -p $INC/etc/skel/.config/autostart
 
 ### 6.2 Salin aset
 
+> ⚠️ **TODO sebelum build:** aset di `assets-final/` masih **dummy**. Ganti dengan aset final sesuai `docs/desain.md` §4 dan `assets-final/README-GANTI-ASET.txt` sebelum menjalankan phase ini di VM.
+
 ```bash
 INC=config/includes.chroot_after_packages
 cp assets-final/wallpaper.png $INC/usr/share/backgrounds/spiderman/wallpaper.png
@@ -954,7 +952,7 @@ cp assets-final/spideros-logo-small.png $INC/usr/share/pixmaps/spideros-logo.png
 
 ### 6.3 Tema GTK "SpiderOS" lewat hook
 
-Cara: salin tema Arc-Dark lalu ganti warna aksen biru menjadi merah.
+Cara: salin tema Arc-Dark lalu ganti warna aksen biru menjadi maroon SpiderOS (`#870000`).
 
 ```bash
 cat > config/hooks/live/0100-theme.hook.chroot <<'EOF'
@@ -965,9 +963,9 @@ DST=/usr/share/themes/SpiderOS
 if [ -d "$SRC" ]; then
   rm -rf "$DST"
   cp -r "$SRC" "$DST"
-  # Ganti aksen biru Arc (#5294E2) menjadi merah Spider-Man (#E23636)
+  # Ganti aksen biru Arc (#5294E2) menjadi maroon SpiderOS (#870000)
   find "$DST" -type f \( -name '*.css' -o -name 'gtkrc' -o -name '*.svg' -o -name 'themerc' -o -name '*.scss' \) \
-    -exec sed -i -e 's/#5294E2/#E23636/Ig' -e 's/rgba(82, *148, *226/rgba(226, 54, 54/Ig' {} +
+    -exec sed -i -e 's/#5294E2/#870000/Ig' -e 's/rgba(82, *148, *226/rgba(135, 0, 0/Ig' {} +
   # Ganti nama tema
   sed -i 's/Arc-Dark/SpiderOS/g' "$DST/index.theme" || true
 fi
@@ -1086,7 +1084,7 @@ Kalau tidak sempat, lewati. Panel default sudah rapi.
 
 Cek di `[TEST-VM]`:
 - [ ] Wallpaper Spider-Man tampil
-- [ ] Tema jendela dan tombol berwarna merah gelap
+- [ ] Tema jendela dan tombol berwarna maroon gelap
 - [ ] Ikon Papirus tampil
 - [ ] (Jika `nox11autologin`) login screen bertema tampil
 
@@ -1149,11 +1147,14 @@ Plymouth memutar animasi dari gambar dan skrip kecil, bukan video.
 
 **Langkah 1: struktur tema**
 
+> ⚠️ **TODO sebelum build:** `assets-final/logo.png` masih **dummy** (400×400 transparan). Ganti dulu — lihat `docs/desain.md` §4.
+
 ```bash
 cd ~/spideros
 INC=config/includes.chroot_after_packages
 PLY=$INC/usr/share/plymouth/themes/spiderman
 mkdir -p $PLY
+# TODO: ganti dummy
 cp assets-final/logo.png $PLY/logo.png
 ```
 
@@ -1176,8 +1177,8 @@ EOF
 
 ```bash
 cat > $PLY/spiderman.script <<'EOF'
-Window.SetBackgroundTopColor(0.04, 0.05, 0.09);
-Window.SetBackgroundBottomColor(0.00, 0.08, 0.30);
+Window.SetBackgroundTopColor(0.09, 0.06, 0.06);
+Window.SetBackgroundBottomColor(0.29, 0.04, 0.04);
 
 logo.image = Image("logo.png");
 logo.sprite = Sprite(logo.image);
@@ -1209,6 +1210,8 @@ chmod +x config/hooks/live/0200-plymouth.hook.chroot
 
 Parameter `splash` sudah ada di `--bootappend-live`, jadi Plymouth akan tampil.
 
+Angka `(0.09, 0.06, 0.06)` adalah `#17100F` (kanvas), sedangkan `(0.29, 0.04, 0.04)` adalah `#4A0B0B` (maroon dalam), sesuai palet di `docs/desain.md` §2.
+
 Verifikasi setelah boot:
 
 ```bash
@@ -1239,7 +1242,10 @@ Ganti file gambar yang ditemukan:
 
 Contoh (sesuaikan path hasil `find`):
 
+> ⚠️ **TODO sebelum build:** `isolinux-splash.png` dan `grub-bg.png` masih **dummy**; ukuran/format harus sama seperti file aslinya. Lihat `docs/desain.md` §4.
+
 ```bash
+# TODO: ganti dummy
 cp assets-final/isolinux-splash.png config/bootloaders/isolinux/splash.png
 # GRUB, kalau ada splash.png di foldernya:
 cp assets-final/grub-bg.png config/bootloaders/grub-pc/splash.png
@@ -1257,18 +1263,20 @@ sed -i 's/Debian GNU\/Linux/SpiderOS/g' config/bootloaders/isolinux/*.cfg
 Untuk ISOLINUX, ubah warna di `stdmenu.cfg`:
 
 ```
-menu color border   0 #ffe23636 #00000000 none
-menu color title    1;37;44 #ffe23636 #00000000 none
-menu color sel      7;37;40 #ffffffff #ffe23636 all
-menu color unsel    37;44 #ffffffff #00000000 none
+menu color border   0 #ff870000 #00000000 none
+menu color title    1;37;40 #ffd7af #00000000 none
+menu color sel      7;37;40 #ffffffff #ff870000 all
+menu color unsel    37;40 #ffd7af #00000000 none
 ```
 
 Untuk GRUB, cari `menu_color` atau `color_normal` di `config/bootloaders/grub-*/`:
 
 ```
 set menu_color_normal=white/black
-set menu_color_highlight=white/light-red
+set menu_color_highlight=white/red
 ```
+
+`white/red` dipilih karena GRUB hanya mengenal nama warna, bukan `#HEX`. Kalau highlight terlalu terang, pakai `white/black` dengan splash maroon.
 
 **Langkah 5: timeout menu (opsional)**
 
@@ -1360,7 +1368,7 @@ NF=$INC/etc/skel/.config/neofetch
 mkdir -p $NF
 ```
 
-ASCII sederhana (`${c1}` merah, `${c2}` biru):
+ASCII sederhana (`${c1}` maroon, `${c2}` krem — neofetch hanya mendukung 8 warna, jadi ini pendekatan terdekat dari palet 256-color Spider-Sense):
 
 ```bash
 cat > $NF/spider.txt <<'EOF'
@@ -1401,7 +1409,7 @@ print_info() {
 }
 image_backend="ascii"
 image_source="/etc/skel/.config/neofetch/spider.txt"
-ascii_colors=(1 4)
+ascii_colors=(1 3)
 title_fqdn="off"
 memory_percent="on"
 EOF
@@ -1413,8 +1421,9 @@ Debian memuat `~/.bash_aliases` otomatis dari `.bashrc`, jadi kita tidak perlu m
 
 ```bash
 cat > $INC/etc/skel/.bash_aliases <<'EOF'
-# Prompt SpiderOS: [user@host dir] dengan warna merah dan biru
-PS1='\[\e[1;31m\][\u\[\e[1;34m\]@\h \[\e[1;37m\]\W\[\e[1;31m\]]\[\e[0m\]\$ '
+# Prompt SpiderOS: [user@host dir] dengan palet hangat Spider-Sense
+# 88 maroon, 180 sand, 223 cream — sama seperti render/ansi.rs
+PS1='\[\e[38;5;88m\][\u\[\e[38;5;180m\]@\h \[\e[38;5;223m\]\W\[\e[38;5;88m\]]\[\e[0m\]\$ '
 
 # Alias
 alias ll='ls -lah --color=auto'
@@ -1438,12 +1447,14 @@ cat > $INC/etc/skel/.config/xfce4/terminal/terminalrc <<'EOF'
 FontName=Fira Code 11
 MiscAlwaysShowTabs=FALSE
 MiscMenubarDefault=FALSE
-ColorForeground=#e6e6e6
-ColorBackground=#0b0c10
-ColorCursor=#e23636
-ColorPalette=#0b0c10;#e23636;#2ecc71;#f1c40f;#3a6df0;#c678dd;#00bcd4;#e6e6e6;#4b4f58;#ff6b6b;#69f0ae;#ffe082;#82a8ff;#e1a3ff;#80deea;#ffffff
+ColorForeground=#ffd7af
+ColorBackground=#17100f
+ColorCursor=#d78787
+ColorPalette=#17100f;#870000;#87af87;#d7af5f;#af8787;#d78787;#ffd7af;#f3e2cf;#4a3a35;#ad1414;#a7cfa7;#e8c775;#d7af87;#e8a0a0;#ffe8c8;#fff5e6
 EOF
 ```
+
+Pemetaan 16 warna: 0 kanvas, 1 maroon, 2 sage, 3 amber, 4 dusk, 5 rose, 6 cream, 7 cream muda, 8 panel, 9 maroon terang, 10 sage terang, 11 amber terang, 12 sand, 13 rose terang, 14 cream terang, 15 putih hangat. Ini membuat warna `spider-sense` (88/174/223/180/138/108/179) tampil konsisten di terminal.
 
 ### 8.5 Build dan uji
 
@@ -1460,8 +1471,8 @@ echo $PS1
 ```
 
 - [ ] `neofetch` menampilkan ASCII laba-laba dan nama "SpiderOS"
-- [ ] Prompt berwarna merah-biru
-- [ ] Warna terminal gelap dengan kursor merah
+- [ ] Prompt berwarna maroon-krem
+- [ ] Warna terminal gelap dengan kursor rose
 
 📸 `P08-neofetch-01.png`, `P08-terminal-01.png`.
 
@@ -1472,7 +1483,7 @@ echo $PS1
 | `neofetch` tidak memakai ASCII kita | Cek `image_source` path, cek `ls -l /etc/skel/.config/neofetch/spider.txt` |
 | Prompt tidak berubah | Pastikan `.bash_aliases` ada di `~` (`ls -a ~`), buka terminal baru |
 | Nama OS tetap "Debian" | Cek hook 0300 di `build.log`, cek `cat /usr/lib/os-release` |
-| Warna ASCII aneh | Sesuaikan `ascii_colors=(1 4)` (1 merah, 4 biru) |
+| Warna ASCII aneh | Sesuaikan `ascii_colors=(1 3)` (1 merah, 3 kuning — pendekatan 8 warna untuk maroon/krem) |
 
 ### 8.7 Commit dan snapshot
 
