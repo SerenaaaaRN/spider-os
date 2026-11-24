@@ -1,7 +1,7 @@
 ## PHASE 4: Desain Aset Visual
 
 **Tujuan:** menyiapkan semua gambar yang dibutuhkan Phase 6, 7, dan 8.
-**Output:** folder `assets-final/` berisi PNG siap pakai, `docs/credits.md` terisi.
+**Output:** folder `assets-final/` berisi PNG siap pakai.
 **Dikerjakan oleh:** Desainer (bisa mulai sejak Phase 1).
 
 ### 4.1 Konsep visual
@@ -16,7 +16,7 @@ Putuskan dulu dan tulis di `docs/desain.md`:
 | Gaya logo | Emblem laba-laba bergaya sendiri (bukan logo resmi) |
 | Font | Satu sans-serif, misal Noto Sans |
 
-Hak cipta: logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Buat desain sendiri bergaya Spider-Man (siluet, motif jaring, palet hangat maroon–cream yang sama dengan Spider-Sense). Jika memakai aset luar, pilih yang lisensinya bebas (CC0 atau CC-BY), lalu catat sumber dan lisensinya di `docs/credits.md`. Tulis di laporan bahwa proyek ini untuk keperluan edukasi non-komersial.
+Hak cipta: logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Buat desain sendiri bergaya Spider-Man (siluet, motif jaring, palet hangat maroon–cream yang sama dengan Spider-Sense). Jika memakai aset luar, pilih yang lisensinya bebas (CC0 atau CC-BY). Tulis di laporan bahwa proyek ini untuk keperluan edukasi non-komersial.
 
 ### 4.2 Daftar aset dan spesifikasi
 
@@ -70,7 +70,7 @@ Default di modul ini: logo statis dengan efek berdenyut (dibuat lewat skrip, tid
 Desainer commit ke Git:
 
 ```bash
-git add assets-src assets-final docs/credits.md docs/desain.md
+git add assets-src assets-final docs/desain.md
 git commit -m "assets: wallpaper, logo, boot splash"
 ```
 
@@ -79,7 +79,6 @@ git commit -m "assets: wallpaper, logo, boot splash"
 - [ ] Konsep dan palet tertulis di `docs/desain.md`
 - [ ] Aset nomor 1–7 selesai dan sesuai ukuran
 - [ ] File sumber (.svg/.xcf) tersimpan di `assets-src/`
-- [ ] `docs/credits.md` terisi (atau tertulis "semua aset buatan sendiri")
 - [ ] Sudah di-commit
 
 ✅ **Selesai kalau:** Builder bisa mengambil semua aset dari `assets-final/` tanpa bertanya.

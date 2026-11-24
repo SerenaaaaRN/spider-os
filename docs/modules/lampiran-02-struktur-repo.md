@@ -9,7 +9,7 @@ spideros/
  ├── config/
  │   ├── package-lists/
  │   │   ├── spideros.list.chroot
- │   │   ├── content.list.chroot                 # yacreader, mpv, audacious
+ │   │   ├── content.list.chroot                 # mcomix, mpv, audacious
  │   │   ├── games.list.chroot                   # bastet, nethack-console, gnome-mines, gnome-sudoku
  │   │   └── spider-sense-build.list.chroot      # cargo, rustc, build-essential (build-only)
  │   ├── hooks/live/
@@ -49,7 +49,7 @@ spideros/
  │   └── stage-spider-sense.sh
  ├── dist/                                  # ISO hasil (tidak di-commit)
  └── docs/
-     ├── catatan.md, bug-log.md, desain.md, credits.md
+     ├── catatan.md, bug-log.md, desain.md
      ├── RELEASE_NOTES.md, PANDUAN_PENGGUNA.md
      └── screenshots/
 ```

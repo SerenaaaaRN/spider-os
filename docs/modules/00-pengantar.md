@@ -5,7 +5,7 @@
 - Tampilan bertema Spider-Man: wallpaper, tema GTK, ikon, login screen, boot menu, animasi boot (Plymouth), terminal.
 - Branding sistem: `neofetch`, prompt bash, `/etc/os-release`.
 - Aplikasi dasar yang ringan dan berguna.
-- **Hiburan offline**: kolektor komik (YACReader) — aplikasi tracking dengan cover, sinopsis, dan status dibaca (komik diisi pengguna sendiri), plus game bawaan dari repo Debian.
+- **Hiburan offline**: pembaca komik (mcomix) — cover/thumbnail, bookmark, dan posisi halaman terakhir (komik diisi pengguna sendiri), plus game bawaan dari repo Debian.
 - **Komponen inti koding**: tool Spider-Sense (**Rust**) yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka terminal dengan ANSI.
 - Dokumentasi lengkap yang langsung jadi bahan BAB III, IV, dan V.
 
@@ -37,7 +37,7 @@ Folder kerja: `~/spideros`. Semua perintah dijalankan dari situ kecuali disebut 
 | 7 | Branding boot (boot menu, Plymouth) | Construction | 3–4 jam |
 | 8 | Branding terminal dan sistem | Construction | 2–3 jam |
 | 9 | Spider-Sense (Rust, komponen inti koding) | Construction | 8–12 jam |
-| 9.5 | Kolektor komik offline (YACReader) | Construction | 1–2 jam |
+| 9.5 | Kolektor komik offline (mcomix) | Construction | 1–2 jam |
 | 9.6 | Game offline dari repo Debian | Construction | 1–2 jam |
 | 10 | Build ISO v1 dan uji menyeluruh di VM | Construction | 2–3 jam |
 | 11 | Flash USB dan uji hardware (UEFI dan Legacy) | Transition | 3–5 jam |

@@ -57,7 +57,7 @@ Buat `docs/PANDUAN_PENGGUNA.md`:
 - Cara boot (tombol boot menu per merek, matikan Secure Boot)
 - Login: user `spider`, password `live`
 - Tur fitur: desktop, aplikasi, `spider-sense`, `neofetch`
-- Aplikasi "SpiderOS Comics": cara menambahkan komik ke folder `/usr/share/spideros/comics/` (cover, sinopsis, status dibaca)
+- Aplikasi "SpiderOS Comics": cara menambahkan komik ke folder `/usr/share/spideros/comics/` (cover, bookmark, posisi halaman terakhir)
 - Game bawaan: Mines, Sudoku, Bastet, NetHack
 - Cara memakai Spider-Sense: `spider-sense`, `spider-sense --once`, `spider-sense --watch`, `spider-sense --help`
 - Tips: mengubah wallpaper, mengatur WiFi, shutdown
@@ -73,7 +73,7 @@ Skenario 3–5 menit, direkam dengan OBS Studio atau perekam layar bawaan:
 - (1:20) Tur tampilan: wallpaper, login, ikon
 - (1:50) Terminal: `neofetch`, prompt, `spider-sense --once`, `spider-sense --watch`
 - (2:30) Aplikasi: Firefox, VLC
-- (2:40) Aplikasi "SpiderOS Comics": tambahkan satu CBZ uji, tampilkan cover dan status dibaca
+- (2:40) Aplikasi "SpiderOS Comics": tambahkan satu CBZ uji, tampilkan cover dan bookmark
 - (3:00) Game bawaan: GNOME Mines atau `bastet` (~20 detik)
 - (3:20) Tunjukkan `cat /proc/cmdline` dan `findmnt /` (bukti live boot)
 - (3:50) Tunjukkan source Rust dan hook `0400-spider-sense-build.hook.chroot` di repositori
@@ -110,13 +110,12 @@ Checklist H-1:
 | Apa kontribusi koding tim? | Spider-Sense ditulis dalam **Rust**, membaca dan mem-parsing `/proc` secara manual, lalu merender ANSI (lihat 9.8) |
 | Kenapa memakai Rust? | Rust menjamin memory safety tanpa garbage collector, menghasilkan binary native tanpa runtime bahasa, dan cocok untuk tool sistem |
 | Di mana kode dikompilasi? | Di dalam chroot saat build ISO melalui hook `0400-spider-sense-build.hook.chroot`, bukan binary yang dibangun di host |
-| Dari mana isi komik dan game-nya? | ISO menyediakan aplikasinya saja (YACReader dari repo Debian); pengguna mengisi komiknya sendiri setelah install. Game dan aplikasi lain di-install dari repo resmi Debian — tidak ada aset berhak cipta pihak ketiga di ISO |
+| Dari mana isi komik dan game-nya? | ISO menyediakan aplikasinya saja (mcomix dari repo Debian); pengguna mengisi komiknya sendiri setelah install. Game dan aplikasi lain di-install dari repo resmi Debian — tidak ada aset berhak cipta pihak ketiga di ISO |
 
 ### 13.7 Checklist Phase 13
 
 - [ ] BAB III sampai V lengkap dan konsisten dengan ISO final
 - [ ] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
-- [ ] Daftar pustaka dan atribusi aset (credits) lengkap
 - [ ] Panduan pengguna, video demo, release notes siap
 - [ ] Latihan presentasi selesai, rencana A, B, C siap
 

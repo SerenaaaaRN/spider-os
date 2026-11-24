@@ -244,8 +244,6 @@ Aturan nama screenshot (simpan di `docs/screenshots/`):
 `P{phase}-{topik}-{nomor}.png`
 contoh: `P02-lb-config-01.png`, `P03-boot-bios-02.png`, `P11-usb-uefi-01.png`
 
-Buat juga `docs/credits.md` untuk mencatat sumber setiap aset (lisensi dan atribusi). Isi tiap kali ada aset dari luar.
-
 ### 1.8 Checklist Phase 1
 
 - [x] VM jalan, RAM 4 GB atau lebih, disk bebas > 25 GB

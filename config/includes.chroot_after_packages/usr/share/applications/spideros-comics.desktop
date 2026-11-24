@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=SpiderOS Comics
-Comment=Kolektor komik offline: cover, sinopsis, status dibaca
-Exec=yacreader
-Icon=yacreader
+Comment=Pembaca komik offline: cover, bookmark, posisi halaman terakhir
+Exec=mcomix
+Icon=mcomix
 Categories=Graphics;

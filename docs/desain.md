@@ -19,7 +19,7 @@
 | Suasa | Hangat, gelap, "web-noir" |
 | Font | **Noto Sans** (UI), **Fira Code** (monospace/terminal) |
 
-Alasan palet hangat: Spider-Sense sudah memakai keluarga warna 256-color hangat (maroon, rose, cream, sand, dusk). Supaya wallpaper, tema GTK, boot menu, Plymouth, prompt, dan terminal terasa satu identitas dengan komponen koding inti, seluruh aset visual mengikuti palet yang sama. Keputusan ini juga sudah tercatat di `docs/credits.md`.
+Alasan palet hangat: Spider-Sense sudah memakai keluarga warna 256-color hangat (maroon, rose, cream, sand, dusk). Supaya wallpaper, tema GTK, boot menu, Plymouth, prompt, dan terminal terasa satu identitas dengan komponen koding inti, seluruh aset visual mengikuti palet yang sama.
 
 ---
 
@@ -80,7 +80,7 @@ Aset di `assets-final/` sudah diganti dengan file final. Checklist di bawah terc
 Kriteria penggantian:
 1. Ukuran dan format sesuai tabel §3 (cek dengan `identify` di VM atau Pillow di Windows).
 2. Warna mengikuti palet §2 — tidak ada biru.
-3. Tidak memakai logo/gambar resmi Spider-Man tanpa lisensi; bila memakai aset luar, catat di `docs/credits.md`.
+3. Tidak memakai logo/gambar resmi Spider-Man tanpa lisensi.
 4. Setelah mengganti, jalankan ulang `scripts/generate-assets.py` **hanya jika** ingin regenerate dari SVG; skrip akan menimpa PNG, jadi simpan dulu file final kamu.
 
 Catatan terkait ada di `docs/catatan.md`, `assets-final/README-GANTI-ASET.txt`, dan langkah salin aset di `docs/modules/phase-06-tema-desktop.md` §6.2 serta `docs/modules/phase-07-branding-boot.md` §7.1/§7.2.
@@ -108,7 +108,7 @@ Semua perubahan ini sudah diterapkan di file-file phase di `docs/modules/`. Vers
 
 ## 6. Hak cipta dan kredit
 
-Logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Aset di proyek ini dibuat sendiri bergaya Spider-Man (siluet, jaring, palet hangat) untuk **keperluan edukasi non-komersial**. Bila sebelum build kamu mengganti dengan aset dari internet, pilih lisensi CC0 atau CC-BY dan catat sumber serta atribusinya di `docs/credits.md`.
+Logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Aset di proyek ini dibuat sendiri bergaya Spider-Man (siluet, jaring, palet hangat) untuk **keperluan edukasi non-komersial**. Semua aset dibuat sendiri bergaya Spider-Man; tidak ada aset pihak ketiga di ISO.
 
 ---
 
@@ -117,7 +117,6 @@ Logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Aset di proyek
 - [x] Konsep dan palet tertulis di `docs/desain.md` (palet mengikuti Spider-Sense).
 - [x] Aset nomor 1–7 ada dan sesuai ukuran — lihat §4.
 - [x] File sumber `.svg` tersimpan di `assets-src/`.
-- [x] `docs/credits.md` terisi.
 - [x] Commit Git — `1d39972` sudah dibuat dan disinkronkan ke `origin/main`.
 
 ✅ **Selesai:** semua kotak §4 tercentang; aset final siap dipakai Phase 6/7. 🕷️

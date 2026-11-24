@@ -7,7 +7,7 @@ SpiderOS adalah distro live turunan **Debian 13 (trixie)** yang dibangun dengan 
 Tujuannya:
 
 - ISO ringan dan bertema: wallpaper, GTK, ikon, login screen, boot menu, Plymouth, dan terminal.
-- Aplikasi dasar plus hiburan offline: YACReader sebagai kolektor komik dan game dari repo Debian.
+- Aplikasi dasar plus hiburan offline: mcomix sebagai kolektor komik dan game dari repo Debian.
 - **Spider-Sense**, tool Rust std-only yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka ANSI real-time — komponen koding inti proyek.
 - Dokumentasi yang langsung dipakai sebagai bahan BAB III, IV, dan V laporan.
 
@@ -29,8 +29,8 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 7 — Branding boot (Plymouth, boot menu) | [`modules/phase-07-branding-boot.md`](modules/phase-07-branding-boot.md) | ✅ Selesai |
 | Phase 8 — Branding terminal dan identitas | [`modules/phase-08-branding-terminal.md`](modules/phase-08-branding-terminal.md) | ✅ Selesai |
 | Phase 9 — Spider-Sense (Rust) | [`modules/phase-09-spider-sense.md`](modules/phase-09-spider-sense.md) | ✅ Selesai (2 item checklist menyusul) |
-| Phase 9.5 — Kolektor komik (YACReader) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ⚠️ File siap, menunggu rebuild ISO |
-| Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ⚠️ File siap, menunggu rebuild ISO |
+| Phase 9.5 — Kolektor komik (mcomix) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ✅ Selesai |
+| Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ✅ Selesai |
 | Phase 10 — ISO v1 dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ✅ Selesai |
 | Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | ⬜ Belum |
 | Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | ⬜ Belum |
@@ -64,6 +64,5 @@ Folder Windows dan folder build di VM (`~/spider-os-build`) sekarang terpisah. B
 - Prosedur dan konfigurasi: file-file phase di `modules/`.
 - Palet warna: `tools/spider-sense/src/render/ansi.rs` → [`desain.md`](desain.md).
 - Catatan progres dan screenshot: [`catatan.md`](catatan.md), `screenshots/`.
-- Atribusi aset: [`credits.md`](credits.md).
 
 
