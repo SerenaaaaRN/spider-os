@@ -289,14 +289,14 @@ Yang diharapkan:
 
 - [x] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan 11 file di `src/`
 - [x] Tidak ada dependency eksternal; hanya `std`
-- [x] `cargo test` lulus (13 unit test)
+- [x] `cargo test` lulus (15 unit test, termasuk 2 test deteksi nama pemanggil `neofetch`)
 - [x] `cargo build --release --locked` sukses
 - [x] `--once` dan `--watch` berjalan dengan fixture di Windows
 - [x] `spider-sense-build.list.chroot`, `scripts/stage-spider-sense.sh`, dan desktop entry ada
-- [ ] `--once` dan `--watch` berjalan di build-VM dengan `/proc` asli
-- [ ] `0400-spider-sense-build.hook.chroot` dibuat di VM dan executable
-- [ ] Binary berada di `/usr/local/bin/spider-sense` di dalam chroot
-- [ ] `cargo` dan `rustc` tidak ikut ke ISO final
+- [x] `--once` berjalan di chroot saat smoke test hook `0400`; `--watch` berjalan di TEST-VM
+- [x] `0400-spider-sense-build.hook.chroot` terpasang dan tereksekusi saat build
+- [x] Binary berada di `/usr/local/bin/spider-sense` (terbukti dari frame di terminal TEST-VM)
+- [ ] `cargo` dan `rustc` tidak ikut ke ISO final — dihapus hook `0400`, belum dicek langsung di VM
 - [ ] Tim dapat menjelaskan alur parser, sampler, renderer ANSI, dan hook build
 - [ ] Commit dan snapshot (`P9-spidersense`)
 

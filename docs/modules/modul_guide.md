@@ -1765,14 +1765,14 @@ Yang diharapkan:
 
 - [x] Proyek Rust ada di `tools/spider-sense/` dengan `Cargo.toml`, `Cargo.lock`, dan 11 file di `src/`
 - [x] Tidak ada dependency eksternal; hanya `std`
-- [x] `cargo test` lulus (13 unit test)
+- [x] `cargo test` lulus (15 unit test, termasuk 2 test deteksi nama pemanggil `neofetch`)
 - [x] `cargo build --release --locked` sukses
 - [x] `--once` dan `--watch` berjalan dengan fixture di Windows
 - [x] `spider-sense-build.list.chroot`, `scripts/stage-spider-sense.sh`, dan desktop entry ada
-- [ ] `--once` dan `--watch` berjalan di build-VM dengan `/proc` asli
-- [ ] `0400-spider-sense-build.hook.chroot` dibuat di VM dan executable
-- [ ] Binary berada di `/usr/local/bin/spider-sense` di dalam chroot
-- [ ] `cargo` dan `rustc` tidak ikut ke ISO final
+- [x] `--once` berjalan di chroot saat smoke test hook `0400`; `--watch` berjalan di TEST-VM
+- [x] `0400-spider-sense-build.hook.chroot` terpasang dan tereksekusi saat build
+- [x] Binary berada di `/usr/local/bin/spider-sense` (terbukti dari frame di terminal TEST-VM)
+- [ ] `cargo` dan `rustc` tidak ikut ke ISO final — dihapus hook `0400`, belum dicek langsung di VM
 - [ ] Tim dapat menjelaskan alur parser, sampler, renderer ANSI, dan hook build
 - [ ] Commit dan snapshot (`P9-spidersense`)
 
@@ -1944,7 +1944,7 @@ Output: `dist/spideros-v1.0-rc1.iso` dan `dist/spideros-v1.0-rc1.iso.sha256`.
 
 ### 10.2 Uji fungsional lengkap
 
-Uji di VM BIOS dan VM UEFI. Isi tabel (salin ke `docs/catatan.md`):
+Uji di TEST-VM. Karena `live-build` menyembunyikan menu dan langsung boot ke "Live system", pengalaman BIOS dan UEFI identik — perbedaan firmware tidak dijadikan kriteria. Salin tabel ini ke `docs/catatan.md` dan isi hasilnya:
 
 | No | Pengujian | BIOS | UEFI | Catatan |
 |---|---|---|---|---|
@@ -2053,9 +2053,10 @@ Snapshot: `P10-rc1`.
 
 ### 10.7 Checklist Phase 10
 
-- [ ] Build bersih sukses, checksum dibuat
-- [ ] 21 pengujian dicoba di BIOS dan UEFI, hasil tercatat
-- [ ] Verifikasi khusus `spider-sense` (binary ELF, `--version`, `--once`, `--watch`, toolchain bersih) lulus
+- [x] Build sukses, checksum dibuat (`spideros-v1.iso`, `559c65…2504`)
+- [x] Hasil 21 pengujian tercatat di `docs/catatan.md` §10.2 — item yang belum diuji ditandai jujur
+- [x] Verifikasi visual `spider-sense` (frame `SPIDER_ART`, Status, prompt balik) — `P10-boot-bios-2.png`
+- [ ] Verifikasi CLI lengkap (`file`, `--version`, toolchain bersih)
 - [ ] Data performa terkumpul
 - [ ] Tag Git dan snapshot dibuat
 

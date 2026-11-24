@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SpiderOS Comics
+Comment=Kolektor komik offline: cover, sinopsis, status dibaca
+Exec=yacreader
+Icon=yacreader
+Categories=Graphics;

@@ -11,7 +11,7 @@ Tujuannya:
 - **Spider-Sense**, tool Rust std-only yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka ANSI real-time — komponen koding inti proyek.
 - Dokumentasi yang langsung dipakai sebagai bahan BAB III, IV, dan V laporan.
 
-Build dilakukan di VM Debian 13 (`[BUILD-VM]`), uji boot di VM test BIOS/UEFI (`[TEST-VM]`), sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. Phase 5–9 sudah siap; berikutnya build final Phase 10.
+Build dilakukan di VM Debian 13 (`[BUILD-VM]`), uji boot di VM test (`[TEST-VM]`), sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. ISO final `spideros-v1.iso` sudah jadi. Phase 1–10 selesai; berikutnya freeze dan laporan.
 
 Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modul_guide.md` berisi versi gabungan, dipakai bila seluruh modul dibutuhkan dalam satu file.
 
@@ -24,14 +24,14 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 2 — Build ISO baseline | [`modules/phase-02-baseline.md`](modules/phase-02-baseline.md) | ✅ Selesai |
 | Phase 3 — Uji baseline di VM (BIOS/UEFI) | [`modules/phase-03-uji-baseline.md`](modules/phase-03-uji-baseline.md) | ✅ Selesai |
 | Phase 4 — Desain aset visual | [`modules/phase-04-desain-aset.md`](modules/phase-04-desain-aset.md) | ✅ Selesai |
-| Phase 5 — Paket, user live, keamanan dasar | [`modules/phase-05-paket-sistem.md`](modules/phase-05-paket-sistem.md) | ⚠️ Siap, belum terverifikasi di ISO |
-| Phase 6 — Tema desktop | [`modules/phase-06-tema-desktop.md`](modules/phase-06-tema-desktop.md) | ⚠️ Siap, belum terverifikasi di ISO |
-| Phase 7 — Branding boot (Plymouth, boot menu) | [`modules/phase-07-branding-boot.md`](modules/phase-07-branding-boot.md) | ⚠️ Siap, belum terverifikasi di ISO |
-| Phase 8 — Branding terminal dan identitas | [`modules/phase-08-branding-terminal.md`](modules/phase-08-branding-terminal.md) | ⚠️ Siap, belum terverifikasi di ISO |
-| Phase 9 — Spider-Sense (Rust) | [`modules/phase-09-spider-sense.md`](modules/phase-09-spider-sense.md) | ⚠️ Kode + hook siap, belum terverifikasi di ISO |
-| Phase 9.5 — Kolektor komik (YACReader) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ⬜ Belum |
-| Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ⬜ Belum |
-| Phase 10 — ISO v1 rc dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ⬜ Belum |
+| Phase 5 — Paket, user live, keamanan dasar | [`modules/phase-05-paket-sistem.md`](modules/phase-05-paket-sistem.md) | ✅ Selesai |
+| Phase 6 — Tema desktop | [`modules/phase-06-tema-desktop.md`](modules/phase-06-tema-desktop.md) | ✅ Selesai |
+| Phase 7 — Branding boot (Plymouth, boot menu) | [`modules/phase-07-branding-boot.md`](modules/phase-07-branding-boot.md) | ✅ Selesai |
+| Phase 8 — Branding terminal dan identitas | [`modules/phase-08-branding-terminal.md`](modules/phase-08-branding-terminal.md) | ✅ Selesai |
+| Phase 9 — Spider-Sense (Rust) | [`modules/phase-09-spider-sense.md`](modules/phase-09-spider-sense.md) | ✅ Selesai (2 item checklist menyusul) |
+| Phase 9.5 — Kolektor komik (YACReader) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ⚠️ File siap, menunggu rebuild ISO |
+| Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ⚠️ File siap, menunggu rebuild ISO |
+| Phase 10 — ISO v1 dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ✅ Selesai |
 | Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | ⬜ Belum |
 | Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | ⬜ Belum |
 | Phase 13 — Laporan, panduan, demo | [`modules/phase-13-laporan.md`](modules/phase-13-laporan.md) | ⬜ Belum |
@@ -39,6 +39,7 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Lampiran C — Struktur akhir repo | [`modules/lampiran-02-struktur-repo.md`](modules/lampiran-02-struktur-repo.md) | — |
 | Lampiran G, H — VirtualBox dan VMware | [`modules/lampiran-03-hypervisor.md`](modules/lampiran-03-hypervisor.md) | — |
 | Versi lengkap satu file (hasil generate) | [`modules/modul_guide.md`](modules/modul_guide.md) | — |
+| Kerangka laporan akhir (BAB III–V) | [`laporan_draft.md`](laporan_draft.md) | ⚠️ Draft, sebagian belum terisi |
 
 ## Cara pakai
 

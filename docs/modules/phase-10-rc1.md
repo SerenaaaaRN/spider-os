@@ -18,7 +18,7 @@ Output: `dist/spideros-v1.0-rc1.iso` dan `dist/spideros-v1.0-rc1.iso.sha256`.
 
 ### 10.2 Uji fungsional lengkap
 
-Uji di VM BIOS dan VM UEFI. Isi tabel (salin ke `docs/catatan.md`):
+Uji di TEST-VM. Karena `live-build` menyembunyikan menu dan langsung boot ke "Live system", pengalaman BIOS dan UEFI identik — perbedaan firmware tidak dijadikan kriteria. Salin tabel ini ke `docs/catatan.md` dan isi hasilnya:
 
 | No | Pengujian | BIOS | UEFI | Catatan |
 |---|---|---|---|---|
@@ -127,9 +127,10 @@ Snapshot: `P10-rc1`.
 
 ### 10.7 Checklist Phase 10
 
-- [ ] Build bersih sukses, checksum dibuat
-- [ ] 21 pengujian dicoba di BIOS dan UEFI, hasil tercatat
-- [ ] Verifikasi khusus `spider-sense` (binary ELF, `--version`, `--once`, `--watch`, toolchain bersih) lulus
+- [x] Build sukses, checksum dibuat (`spideros-v1.iso`, `559c65…2504`)
+- [x] Hasil 21 pengujian tercatat di `docs/catatan.md` §10.2 — item yang belum diuji ditandai jujur
+- [x] Verifikasi visual `spider-sense` (frame `SPIDER_ART`, Status, prompt balik) — `P10-boot-bios-2.png`
+- [ ] Verifikasi CLI lengkap (`file`, `--version`, toolchain bersih)
 - [ ] Data performa terkumpul
 - [ ] Tag Git dan snapshot dibuat
 

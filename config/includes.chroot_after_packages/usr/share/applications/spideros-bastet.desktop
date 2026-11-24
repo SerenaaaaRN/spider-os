@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Bastet (Tetris)
+Comment=Tetris clone dari repo Debian
+Exec=xfce4-terminal --hold -e bastet
+Icon=org.gnome.SwellFoop
+Categories=Game;BlocksGame;

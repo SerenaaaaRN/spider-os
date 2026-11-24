@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=NetHack
+Comment=Roguelike klasik
+Exec=xfce4-terminal --hold -e nethack
+Icon=org.gnome.SwellFoop
+Categories=Game;RolePlaying;

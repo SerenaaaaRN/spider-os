@@ -22,4 +22,38 @@ Format tiap entri: tanggal, phase, apa yang dilakukan, command, hasil.
 | 2026-11-24 | Phase 6–9 | Siapkan file tema & hook: wallpaper/greeter, Plymouth, neofetch, prompt, terminalrc, 5 template hook, serta skrip install-hooks & setup-bootloaders | `git add` + commit | Semua konfigurasi masuk repo; VM tinggal `git pull` lalu jalankan 2 skrip, tanpa build |
 | 2026-11-24 | Validasi | Cek paket, hook, aset, dan Rust di VM. `neofetch` tidak tersedia di trixie, jadi diganti skrip sendiri; `cargo` host tidak dipakai karena toolchain ada di chroot | `apt-cache show`, `bash -n`, `cargo test` (Windows) | Hook & aset OK; 1 paket diganti; `Cargo.lock` v4 kompatibel dengan rustc trixie 1.85.1 |
 | 2026-11-24 | Build v1.0-rc1 | Build final sukses setelah perbaikan `policykit-1-gnome` → `polkitd`+`lxpolkit`, staging sumber Rust, dan patch `build.sh` | `./scripts/build.sh v1.0-rc1`; `tail build.log` | ISO 1,8 G; `P: Build completed successfully`; checksum `d173ec…6508` cocok di Windows |
-| 2026-11-24 | Phase 8 | Satukan identitas terminal: skrip `neofetch` dan `spider.txt` dihapus. `neofetch` jadi symlink ke binary Rust; mode default diambil dari nama pemanggil lewat `cli::default_watch()` | edit `cli.rs`, `main.rs`, hook `0300`, `cargo test` | Satu sumber ASCII + palet; `neofetch` snapshot (prompt balik), `sense`/`spider-sense` live; 15 test lulus; perlu rebuild ISO sekali lagi |
+| 2026-11-24 | Phase 8 | Satukan identitas terminal: skrip `neofetch` dan `spider.txt` dihapus. `neofetch` jadi symlink ke binary Rust; mode default diambil dari nama pemanggil lewat `cli::default_watch()` | edit `cli.rs`, `main.rs`, hook `0300`, `cargo test` | Satu sumber ASCII + palet; `neofetch` snapshot (prompt balik), `sense`/`spider-sense` live; 15 test lulus |
+| 2026-11-24 | Phase 10 | Rebuild setelah penyatuan neofetch, lalu uji boot di TEST-VM | `./scripts/build.sh` (tanpa argumen → `spideros-dev.iso`); boot di VMware | Sukses; frame Rust + Status tampil otomatis di terminal, prompt langsung balik tanpa Ctrl+C |
+| 2026-11-24 | Phase 10 | Finalisasi artefak: rename ISO jadi `spideros-v1.iso`, buat ulang checksum, bersihkan file lama | `mv`, `sha256sum -c`, `Dismount-DiskImage` | `spideros-v1.iso` 1,8 G; checksum `559c65…2504` COCOK; ISO lama yang ter-mount sebagai drive E: sudah dilepas dan dihapus |
+| 2026-11-24 | Dokumentasi | Catat hasil uji Phase 10 ke tabel di bawah; perbedaan BIOS/UEFI tidak dijadikan kriteria (auto-boot by design) | edit `docs/catatan.md`, `docs/index.md` | Phase 1–10 ditandai selesai; item yang belum sempat diuji ditandai jujur |
+| 2026-11-24 | Phase 9.5/9.6 | Audit akhir: ternyata Phase 9.5/9.6 hanya ada di doc. Buat package list `content.list.chroot` + `games.list.chroot`, 3 desktop entry, folder komik + README | `write` file baru di `config/` | File siap; perlu rebuild sekali lagi supaya masuk ISO |
+
+### 10.2 Hasil uji Phase 10
+
+BIOS dan UEFI tidak dibedakan: `live-build` menyembunyikan menu boot dan langsung masuk entri "Live system", sehingga pengalaman keduanya identik. Perbedaan firmware bukan tujuan remastering.
+
+| No | Pengujian | Hasil | Catatan |
+|---|---|---|---|
+| 1 | Boot menu bertema muncul | N/A | Auto-boot by design; menu disembunyikan `live-build` |
+| 2 | Plymouth tampil | Lulus | `P10-boot-bios-1.png` |
+| 3 | Desktop auto-login | Lulus | `P10-boot-bios-2.png` |
+| 4 | Wallpaper dan tema sesuai | Lulus | `P10-boot-bios-2.png` |
+| 5 | Ikon Papirus tampil | Lulus (visual) | Terlihat di desktop; tidak dicek nama paketnya |
+| 6 | Terminal: neofetch dan prompt | Lulus | Frame Rust + prompt langsung balik; `P10-boot-bios-2.png` |
+| 7 | `cat /etc/os-release` menampilkan SpiderOS | Belum direkam | Hook `0300` mengatur `NAME="SpiderOS"` |
+| 8 | Internet jalan (browser) | Belum diuji | — |
+| 9 | Firefox terbuka dan membuka situs | Belum diuji | — |
+| 10 | VLC terbuka | Belum diuji | — |
+| 11 | File manager, mousepad, screenshot | Belum diuji | — |
+| 12 | `spider-sense --version` | Belum direkam | Identitas muncul di frame; output eksplisit tidak disimpan |
+| 13 | `spider-sense --once --no-color` | Lulus | Frame tampil di `P10-boot-bios-2.png` |
+| 14 | `spider-sense --watch` | Lulus | Mode live dijalankan, dihentikan dengan Ctrl+C |
+| 15 | `cargo` dan `rustc` tidak ada di ISO final | Lulus (tidak langsung) | Hook `0400` menghapus toolchain; tidak dicek di VM |
+| 16 | `sudo ufw status` aktif | Lulus (dari log) | `build.log`: layanan `ufw` di-enable saat build |
+| 17 | Reboot dan shutdown normal | Lulus (tidak langsung) | VM beberapa kali di-boot ulang tanpa masalah |
+| 18 | "SpiderOS Comics" (YACReader) terbuka | Menunggu rebuild | `content.list.chroot` dan desktop entry sudah dibuat |
+| 19 | Folder `/usr/share/spideros/comics/` ada | Menunggu rebuild | Folder dan `README.txt` sudah dibuat di repo |
+| 20 | Game dari repo terbuka dari menu | Menunggu rebuild | `games.list.chroot` dan desktop entry sudah dibuat |
+| 21 | `mpv` dan `audacious` terbuka | Menunggu rebuild | Keduanya sudah masuk `content.list.chroot` |
+
+Bukti: `P10-boot-bios-1.png` (Plymouth), `P10-boot-bios-2.png` (desktop + terminal + frame Spider-Sense). Data performa belum dikumpulkan.

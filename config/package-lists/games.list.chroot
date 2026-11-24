@@ -1,0 +1,7 @@
+# --- Game terminal ---
+bastet
+nethack-console
+
+# --- Game GUI ringan (sudah menyediakan desktop entry sendiri) ---
+gnome-mines
+gnome-sudoku
