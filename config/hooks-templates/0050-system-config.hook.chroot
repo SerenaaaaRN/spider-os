@@ -1,0 +1,15 @@
+#!/bin/bash
+# Template hook konfigurasi dasar (Phase 5.3).
+# Di VM, salin ke config/hooks/live/ lalu chmod +x. Folder hooks itu di-ignore Git.
+set -e
+
+# Browser default
+update-alternatives --set x-www-browser /usr/bin/firefox-esr || true
+
+# Firewall: aktif saat boot, tolak koneksi masuk
+sed -i 's/^ENABLED=.*/ENABLED=yes/' /etc/ufw/ufw.conf || true
+systemctl enable ufw || true
+
+# Bersihkan cache apt agar ISO lebih kecil
+apt-get clean
+rm -rf /var/lib/apt/lists/*

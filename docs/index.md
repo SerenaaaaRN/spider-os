@@ -46,6 +46,15 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 - `modules/modul_guide.md` adalah versi gabungan dari semua file di atas. Dihasilkan oleh `scripts/generate-modul.py`; tidak diedit langsung.
 - Setelah mengubah file phase, jalankan `python scripts/generate-modul.py` untuk memperbarui versi gabungan.
 
+## Alur sinkronisasi Windows ↔ VM
+
+Folder Windows dan folder build di VM (`~/spider-os-build`) sekarang terpisah. Build wajib dijalankan di path native VM, bukan di `/mnt/hgfs`.
+
+- **Source (docs, config, scripts, aset):** lewat Git. Edit di Windows → `git commit` + `git push` → `git pull` di VM.
+- **Artefak (ISO, `.sha256`, `build.log`, screenshot):** dari VM jalankan `./scripts/sync-artifacts.sh` supaya tersalin ke `/mnt/hgfs/SpiderOS-Share/spider-os` (folder Windows yang sama).
+- `scripts/build.sh` sudah ada di repo, jadi tidak perlu dibuat manual di VM.
+- `config/hooks/` di-ignore Git. Template hook ada di `config/hooks-templates/`; di VM tinggal disalin ke `config/hooks/live/` lalu `chmod +x`.
+
 ## Sumber kebenaran
 
 - Prosedur dan konfigurasi: file-file phase di `modules/`.
