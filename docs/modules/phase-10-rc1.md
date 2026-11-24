@@ -39,7 +39,7 @@ Uji di TEST-VM. Karena `live-build` menyembunyikan menu dan langsung boot ke "Li
 | 15 | `cargo` dan `rustc` tidak ada di ISO final |  |  |  |
 | 16 | `sudo ufw status` aktif |  |  |  |
 | 17 | Reboot dan shutdown normal |  |  |  |
-| 18 | "SpiderOS Comics" (YACReader) terbuka, cover + status dibaca jalan |  |  |  |
+| 18 | "SpiderOS Comics" (mcomix) terbuka, cover + bookmark jalan |  |  |  |
 | 19 | Folder `/usr/share/spideros/comics/` ada dengan README |  |  |  |
 | 20 | Game dari repo terbuka dari menu (`bastet`, NetHack, Mines, Sudoku) |  |  |  |
 | 21 | `mpv` dan `audacious` terbuka |  |  |  |

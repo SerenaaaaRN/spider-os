@@ -9,7 +9,7 @@ spideros/
  ├── config/
  │   ├── package-lists/
  │   │   ├── spideros.list.chroot
- │   │   ├── content.list.chroot                 # yacreader, mpv, audacious
+ │   │   ├── content.list.chroot                 # mcomix, mpv, audacious
  │   │   ├── games.list.chroot                   # bastet, nethack-console, gnome-mines, gnome-sudoku
  │   │   └── spider-sense-build.list.chroot      # cargo, rustc, build-essential (build-only)
  │   ├── hooks/live/

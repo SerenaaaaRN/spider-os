@@ -39,9 +39,24 @@ Dokumen ini adalah bahan mentah BAB III–V. Isi yang sudah terisi berasal dari 
 - Identitas terminal disatukan: `neofetch` = symlink ke binary Rust, satu sumber ASCII dan palet.
 
 ### 3.2.3 Integrasi aplikasi pendukung
-- Paket yang terpasang: `firefox-esr`, VLC, XFCE, firmware, `polkitd` + `lxpolkit` (menggantikan `policykit-1-gnome` yang dihapus dari trixie), `ufw`.
-- **Ditambahkan, menunggu rebuild:** YACReader, mpv, audacious, dan game. Package list `content.list.chroot`/`games.list.chroot`, 3 desktop entry, serta folder komik sudah dibuat setelah audit akhir. Item uji 18–21 di `docs/catatan.md` ditandai `Menunggu rebuild`.
-- `neofetch` tidak tersedia di trixie — digantikan oleh mode snapshot Spider-Sense.
+Daftar lengkap paket tambahan di luar baseline XFCE live-build:
+
+| Kategori | Paket |
+|---|---|
+| Browser & media | `firefox-esr`, `vlc`, `mcomix`, `mpv`, `audacious` |
+| Game | `bastet`, `nethack-console`, `gnome-mines`, `gnome-sudoku` |
+| Desktop | `xfce4-whiskermenu-plugin`, `xfce4-pulseaudio-plugin`, `xfce4-power-manager`, `xfce4-notifyd`, `xfce4-screenshooter`, `xfce4-taskmanager`, `thunar-archive-plugin`, `mousepad`, `ristretto`, `file-roller` |
+| Sistem | `network-manager`, `network-manager-gnome`, `pulseaudio`, `pavucontrol`, `lightdm`, `gvfs`, `gvfs-backends`, `dbus-x11` |
+| Alat | `htop`, `git`, `curl`, `wget`, `nano`, `sudo`, `ufw` |
+| Tema/font | `arc-theme`, `papirus-icon-theme`, `librsvg2-common`, `fonts-noto-core`, `fonts-firacode` |
+| Firmware | `firmware-linux`, `firmware-linux-nonfree`, `firmware-misc-nonfree`, `firmware-iwlwifi`, `firmware-realtek`, `firmware-atheros`, `firmware-brcm80211`, `firmware-amd-graphics`, `intel-microcode`, `amd64-microcode` |
+| Build-only | `cargo`, `rustc`, `build-essential` — di-`purge` oleh hook `0400`, tidak ikut ISO |
+
+Paket untuk komik, media, dan game berada di package list terpisah: `content.list.chroot` dan `games.list.chroot`. Keduanya dibuat setelah audit akhir, sehingga **menunggu rebuild** supaya masuk ISO; item uji 18–21 di `docs/catatan.md` ditandai demikian.
+
+`policykit-1-gnome` tidak dipasang karena sudah dihapus dari trixie — diganti `polkitd` + `lxpolkit`. `neofetch` juga tidak tersedia di trixie — digantikan oleh mode snapshot Spider-Sense.
+
+Tidak ada paket bawaan Debian yang dihapus secara eksplisit; perubahan bersifat penambahan dari baseline XFCE live-build. Pengecualiannya adalah toolchain build yang dibuang dari chroot setelah kompilasi.
 - Spider-Sense: Rust std-only, membaca `/proc` langsung, parser manual, sampler CPU delta, renderer ANSI, status Tenang/Waspada/BAHAYA.
 
 ### 3.2.4 Proses remastering
@@ -86,6 +101,7 @@ Dokumen ini adalah bahan mentah BAB III–V. Isi yang sudah terisi berasal dari 
 - Build sukses: `P: Build completed successfully` di `build.log`.
 - Hasil: `spideros-v1.iso`, 1.893.974.016 byte, SHA-256 `559c65…2504` (diverifikasi COCOK di Windows).
 - Kendala yang diatasi: `policykit-1-gnome` dihapus dari trixie → `polkitd`+`lxpolkit`; staging sumber Rust belum ada → `stage-spider-sense.sh`; bentrok lock apt dari build ganda → proses dihentikan sebelum rebuild; ISO ter-mount sebagai drive E: → dilepas sebelum dihapus.
+- Toolchain Rust dipasang hanya di chroot saat kompilasi lalu di-purge supaya tidak ikut ISO. File `.deb`-nya tetap tersimpan di folder `cache/` build-VM, sehingga rebuild berikutnya tidak mengunduh ulang toolchain — `scripts/build.sh` sengaja memakai `lb clean` tanpa `--purge`. Bukti: rebuild terakhir hanya mengunduh `squashfs-tools` sekitar 249 kB.
 
 ### 4.3.1 Pembuatan media live boot
 - **BELUM** — Phase 11 (flash USB) belum dijalankan. Perlu Rufus/Etcher + screenshot pengaturan.
@@ -146,7 +162,7 @@ Dokumen ini adalah bahan mentah BAB III–V. Isi yang sudah terisi berasal dari 
 - [ ] Data performa (RAM idle, waktu boot, jumlah proses)
 - [ ] Output CLI Spider-Sense lengkap (`file`, `--version`, toolchain bersih)
 - [ ] Rebuild ISO sekali lagi supaya Phase 9.5/9.6 masuk
-- [ ] Uji aplikasi: Firefox, VLC, YACReader, game, mpv, audacious
+- [ ] Uji aplikasi: Firefox, VLC, mcomix, game, mpv, audacious
 - [ ] Phase 11: flash USB dan uji hardware
 - [ ] Foto kerja tim, video demo, panduan pengguna
 - [ ] Tag Git `v1.0` dan freeze Phase 12 (butuh izin eksplisit)

@@ -87,7 +87,7 @@ du -sh chroot cache binary 2>/dev/null
 - [ ] Phase 7: Boot menu dan Plymouth
 - [ ] Phase 8: Branding terminal
 - [ ] Phase 9: Spider-Sense (Rust, komponen inti koding)
-- [ ] Phase 9.5: Kolektor komik offline (YACReader)
+- [ ] Phase 9.5: Kolektor komik offline (mcomix)
 - [ ] Phase 9.6: Game offline dari repo Debian
 - [ ] Phase 10: ISO v1 rc dan uji VM
 

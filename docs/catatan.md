@@ -51,7 +51,7 @@ BIOS dan UEFI tidak dibedakan: `live-build` menyembunyikan menu boot dan langsun
 | 15 | `cargo` dan `rustc` tidak ada di ISO final | Lulus (tidak langsung) | Hook `0400` menghapus toolchain; tidak dicek di VM |
 | 16 | `sudo ufw status` aktif | Lulus (dari log) | `build.log`: layanan `ufw` di-enable saat build |
 | 17 | Reboot dan shutdown normal | Lulus (tidak langsung) | VM beberapa kali di-boot ulang tanpa masalah |
-| 18 | "SpiderOS Comics" (YACReader) terbuka | Menunggu rebuild | `content.list.chroot` dan desktop entry sudah dibuat |
+| 18 | "SpiderOS Comics" (mcomix) terbuka | Menunggu rebuild | `content.list.chroot` dan desktop entry sudah dibuat |
 | 19 | Folder `/usr/share/spideros/comics/` ada | Menunggu rebuild | Folder dan `README.txt` sudah dibuat di repo |
 | 20 | Game dari repo terbuka dari menu | Menunggu rebuild | `games.list.chroot` dan desktop entry sudah dibuat |
 | 21 | `mpv` dan `audacious` terbuka | Menunggu rebuild | Keduanya sudah masuk `content.list.chroot` |

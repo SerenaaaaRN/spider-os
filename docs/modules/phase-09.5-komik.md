@@ -1,17 +1,18 @@
-## PHASE 9.5: Kolektor Komik Offline — YACReader
+## PHASE 9.5: Kolektor Komik Offline — mcomix
 
-**Tujuan:** distro punya aplikasi kolektor komik: cover, sinopsis, dan status sudah/belum dibaca.
-**Output:** `yacreader` terpasang, desktop entry di menu aplikasi, folder koleksi siap pakai.
+**Tujuan:** distro punya pembaca komik offline: cover/thumbnail, bookmark, dan mengingat halaman terakhir.
+**Output:** `mcomix` terpasang, desktop entry di menu aplikasi, folder koleksi siap pakai.
 **Status:** tambahan (wajib selesai sebelum rc1 — feature freeze Phase 10.5).
 
-Keputusan konten: **ISO hanya menyediakan aplikasinya, bukan komiknya.** Tim tidak membuat komik. YACReader adalah aplikasi koleksi (karya komunitas, GPLv3, dari repo Debian): pengguna yang mengisi komiknya sendiri setelah install — dari koleksi pribadi mereka. Aplikasi otomatis menampilkan cover, sinopsis (dari metadata CBZ), dan status dibaca untuk koleksi apapun yang ditambahkan.
+
+Keputusan konten: **ISO hanya menyediakan aplikasinya, bukan komiknya.** Tim tidak membuat komik. Pengguna mengisi sendiri komiknya dari koleksi pribadi mereka setelah menjalankan sistem.
 
 ### 9.5.1 Daftar paket konten
 
 ```bash
 cat > config/package-lists/content.list.chroot <<'EOF'
-# --- Kolektor komik offline (tracking cover, sinopsis, status dibaca) ---
-yacreader
+# --- Pembaca komik offline (cover, bookmark, posisi halaman terakhir) ---
+mcomix
 
 # --- Media offline ---
 mpv
@@ -41,32 +42,32 @@ cat > $INC/usr/share/applications/spideros-comics.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
 Name=SpiderOS Comics
-Comment=Kolektor komik offline: cover, sinopsis, status dibaca
-Exec=yacreader
-Icon=yacreader
+Comment=Pembaca komik offline: cover, bookmark, posisi halaman terakhir
+Exec=mcomix
+Icon=mcomix
 Categories=Graphics;
 EOF
 ```
 
 ### 9.5.4 Verifikasi di TEST-VM
 
-- [ ] `command -v yacreader` menemukan binary
+- [ ] `command -v mcomix` menemukan binary
 - [ ] Buka "SpiderOS Comics" dari menu aplikasi → aplikasi jalan
-- [ ] Uji tracking: tambahkan satu file CBZ apa pun dari folder `comics/` (bisa buat dummy: zip berisi beberapa PNG) → cover tampil
-- [ ] Tandai "sudah dibaca", tutup, buka lagi → status tersimpan
+- [ ] Tambahkan satu file CBZ apa pun dari folder `comics/` (bisa buat dummy: zip berisi beberapa PNG) → cover/thumbnail tampil
+- [ ] Pasang bookmark, tutup, buka lagi → bookmark dan posisi halaman tersimpan
 - [ ] `mpv` dan `audacious` terbuka
 
-📸 `P9.5-comics-01.png` (aplikasi terbuka), `P9.5-comics-tracking-01.png` (status dibaca tersimpan).
+📸 `P9.5-comics-01.png` (aplikasi terbuka), `P9.5-comics-tracking-01.png` (bookmark tersimpan).
 
 ### 9.5.5 Checklist Phase 9.5
 
-- [ ] `content.list.chroot` ada (`yacreader`, `mpv`, `audacious`)
+- [ ] `content.list.chroot` ada (`mcomix`, `mpv`, `audacious`)
 - [ ] Folder `/usr/share/spideros/comics/` dengan README ada
 - [ ] Desktop entry "SpiderOS Comics" muncul di menu
-- [ ] Cover, sinopsis, dan status dibaca teruji dengan file uji di TEST-VM
+- [ ] Cover, bookmark, dan posisi halaman teruji dengan file uji di TEST-VM
 - [ ] Commit dan snapshot (`P9.5-comics`)
 
-✅ **Selesai kalau:** membuka menu aplikasi → "SpiderOS Comics" → tracking jalan pada komik apapun yang pengguna tambahkan sendiri, tanpa internet.
+✅ **Selesai kalau:** membuka menu aplikasi → "SpiderOS Comics" → komik dapat dibaca lengkap dengan cover dan bookmark, tanpa internet.
 
 ---
 
