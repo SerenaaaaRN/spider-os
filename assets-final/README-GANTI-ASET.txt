@@ -1,28 +1,23 @@
 ===============================================================================
-PERINGATAN: SEMUA PNG DI FOLDER INI MASIH DUMMY / PLACEHOLDER
+ASET FINAL SPIDEROS — Phase 4 selesai
 ===============================================================================
 
-Dibuat otomatis oleh scripts/generate-assets.py untuk menutup Phase 4 lebih
-dulu. JANGAN langsung dipakai untuk build final sebelum diganti.
+File di folder ini sudah diganti dari placeholder dan siap dipakai Phase 6/7.
+Warna tidak diubah dari file yang disiapkan.
 
-GANTI SEBELUM BUILD PHASE 6/7 DI VM:
-  [ ] wallpaper.png              1920x1080  - desktop
-  [ ] login.png                  1920x1080  - layar login LightDM
-  [ ] logo.png                   400x400 transparan - Plymouth & neofetch
-  [ ] grub-bg.png                1920x1080  - boot menu UEFI (GRUB)
-  [ ] isolinux-splash.png        TEPAT 640x480 - boot menu BIOS
-  [ ] spideros-logo-small.png    128x128    - foto profil & ikon menu
-  [ ] ../assets-src/logo.svg     sumber vektor final
+CHECKLIST:
+  [x] wallpaper.png              1920x1080  - desktop
+  [x] login.png                  1920x1080  - layar login LightDM
+  [x] logo.png                   400x400 transparan - Plymouth & neofetch
+  [x] grub-bg.png                1920x1080  - boot menu UEFI (GRUB)
+  [x] isolinux-splash.png        TEPAT 640x480 - boot menu BIOS
+  [x] spideros-logo-small.png    128x128    - foto profil & ikon menu
+  [x] ../assets-src/logo.svg     sumber vektor (satu salinan)
 
-SYARAT:
-  1. Palet mengikuti docs/desain.md §2 (maroon #870000, rose #D78787,
-     cream #FFD7AF, sand #D7AF87, dusk #AF8787, kanvas #17100F).
-     TIDAK BOLEH ada biru.
-  2. Tidak pakai logo/gambar resmi Spider-Man tanpa lisensi. Kalau pakai
-     aset luar (CC0/CC-BY), catat di docs/credits.md.
-  3. Cek dimensi dengan `identify *.png` di VM atau Pillow di Windows.
-  4. Kalau menjalankan ulang scripts/generate-assets.py, file final kamu
-     AKAN DITIMPA. Simpan dulu di tempat lain.
+CATATAN:
+  1. Ukuran dan format sudah dicek dengan Pillow.
+  2. Menjalankan ulang scripts/generate-assets.py AKAN menimpa PNG di sini.
+     Simpan dulu file final jika ingin regenerate dari SVG.
 
-Detail lengkap: docs/desain.md §4 dan docs/catatan.md entri Phase 4.
+Detail: docs/desain.md §4 dan docs/catatan.md.
 ===============================================================================

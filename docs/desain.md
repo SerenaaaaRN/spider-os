@@ -1,6 +1,6 @@
 # Desain Visual SpiderOS
 
-> **Status:** Phase 4 — konsep dan palet final, **aset masih DUMMY/placeholder**.
+> **Status:** Phase 4 — konsep, palet, dan aset final sudah terpasang.
 > **Sumber kebenaran warna:** `tools/spider-sense/src/render/ansi.rs` (palet ANSI Spider-Sense).
 > Palet utama: maroon, rose, cream, sand, dusk. Detail di `docs/modules/phase-04-desain-aset.md` §4.1.
 > Guide sudah disesuaikan di Phase 4.1, 6.3, 7.1, 7.2, 8.2, 8.3, 8.4.
@@ -52,30 +52,30 @@ Lima warna pertama diambil **persis** dari konstanta di `tools/spider-sense/src/
 
 | No | Aset | Ukuran | Format | Dipakai di | Status sekarang |
 |---|---|---|---|---|---|
-| 1 | `wallpaper.png` | 1920×1080 | PNG | Desktop | **DUMMY** |
-| 2 | `login.png` | 1920×1080 | PNG | Layar login LightDM | **DUMMY** |
-| 3 | `logo.png` | 400×400, transparan | PNG | Plymouth, neofetch, menu | **DUMMY** |
-| 4 | `logo.svg` | vektor | SVG | Sumber logo | **DUMMY** |
-| 5 | `grub-bg.png` | 1920×1080 | PNG | Boot menu UEFI (GRUB) | **DUMMY** |
-| 6 | `isolinux-splash.png` | 640×480 | PNG | Boot menu BIOS | **DUMMY** |
-| 7 | `spideros-logo-small.png` | 128×128 | PNG | Foto profil user, ikon menu | **DUMMY** |
+| 1 | `wallpaper.png` | 1920×1080 | PNG | Desktop | **Final** |
+| 2 | `login.png` | 1920×1080 | PNG | Layar login LightDM | **Final** |
+| 3 | `logo.png` | 400×400, transparan | PNG | Plymouth, neofetch, menu | **Final** |
+| 4 | `logo.svg` | vektor | SVG | Sumber logo | **Final** |
+| 5 | `grub-bg.png` | 1920×1080 | PNG | Boot menu UEFI (GRUB) | **Final** |
+| 6 | `isolinux-splash.png` | 640×480 | PNG | Boot menu BIOS | **Final** |
+| 7 | `spideros-logo-small.png` | 128×128 | PNG | Foto profil user, ikon menu | **Final** |
 | 8 | `frame-000..N.png` | 400×400 | PNG | Animasi Plymouth frame | Opsional, **tidak dibuat** (default: logo berdenyut via skrip) |
 
-Sumber vektor dummy ada di `assets-src/` (`logo.svg`, `wallpaper.svg`). PNG dihasilkan oleh `scripts/generate-assets.py` memakai Python + Pillow (ImageMagick/Inkscape tidak tersedia di host Windows). Total ukuran aset dijaga di bawah ~10 MB.
+Sumber vektor ada di `assets-src/logo.svg` (satu salinan). PNG final disiapkan dan dinormalisasi dengan Python + Pillow; ukuran dan format dicek sebelum dipakai. `scripts/generate-assets.py` adalah generator dummy lama — menjalankannya akan menimpa PNG final. Total ukuran aset dijaga di bawah ~10 MB.
 
 ---
 
-## 4. ⚠️ TODO: ganti aset dummy sebelum build
+## 4. Aset final — status penggantian
 
-Aset di `assets-final/` **masih placeholder** dan sengaja dibuat sederhana. Sebelum menjalankan Phase 6/7 di VM, ganti file-file berikut dengan desain final:
+Aset di `assets-final/` sudah diganti dengan file final. Checklist di bawah tercapai:
 
-- [ ] `assets-final/wallpaper.png` → cari/ gambar wallpaper 1920×1080 bertema jaring/kota dengan palet di §2.
-- [ ] `assets-final/login.png` → versi login (boleh sama, lebih gelap di sisi kiri untuk teks greeter).
-- [ ] `assets-final/logo.png` → logo 400×400 **transparan**; ini yang dipakai Plymouth & `neofetch`.
-- [ ] `assets-final/logo.svg` → sumber vektor final di `assets-src/`.
-- [ ] `assets-final/grub-bg.png` → 1920×1080 untuk GRUB.
-- [ ] `assets-final/isolinux-splash.png` → **tepat 640×480** untuk ISOLINUX.
-- [ ] `assets-final/spideros-logo-small.png` → 128×128.
+- [x] `assets-final/wallpaper.png` → cari/ gambar wallpaper 1920×1080 bertema jaring/kota dengan palet di §2.
+- [x] `assets-final/login.png` → versi login (boleh sama, lebih gelap di sisi kiri untuk teks greeter).
+- [x] `assets-final/logo.png` → logo 400×400 **transparan**; ini yang dipakai Plymouth & `neofetch`.
+- [x] `assets-src/logo.svg` → sumber vektor final (satu salinan, tidak ada duplikat di `assets-final/`).
+- [x] `assets-final/grub-bg.png` → 1920×1080 untuk GRUB.
+- [x] `assets-final/isolinux-splash.png` → **tepat 640×480** untuk ISOLINUX.
+- [x] `assets-final/spideros-logo-small.png` → 128×128.
 
 Kriteria penggantian:
 1. Ukuran dan format sesuai tabel §3 (cek dengan `identify` di VM atau Pillow di Windows).
@@ -83,10 +83,7 @@ Kriteria penggantian:
 3. Tidak memakai logo/gambar resmi Spider-Man tanpa lisensi; bila memakai aset luar, catat di `docs/credits.md`.
 4. Setelah mengganti, jalankan ulang `scripts/generate-assets.py` **hanya jika** ingin regenerate dari SVG; skrip akan menimpa PNG, jadi simpan dulu file final kamu.
 
-Reminder juga dipasang di:
-- `docs/catatan.md` (entri Phase 4 bertanda DUMMY),
-- `assets-final/README-GANTI-ASET.txt`,
-- penanda `# TODO: ganti dummy` di `docs/modules/phase-06-tema-desktop.md` §6.2 dan `docs/modules/phase-07-branding-boot.md` §7.1/§7.2.
+Catatan terkait ada di `docs/catatan.md`, `assets-final/README-GANTI-ASET.txt`, dan langkah salin aset di `docs/modules/phase-06-tema-desktop.md` §6.2 serta `docs/modules/phase-07-branding-boot.md` §7.1/§7.2.
 
 ---
 
@@ -118,9 +115,9 @@ Logo, karakter, dan gambar resmi Spider-Man dilindungi hak cipta. Aset di proyek
 ## 7. Checklist Phase 4
 
 - [x] Konsep dan palet tertulis di `docs/desain.md` (palet mengikuti Spider-Sense).
-- [~] Aset nomor 1–7 ada dan sesuai ukuran — **masih dummy**, lihat §4.
+- [x] Aset nomor 1–7 ada dan sesuai ukuran — lihat §4.
 - [x] File sumber `.svg` tersimpan di `assets-src/`.
 - [x] `docs/credits.md` terisi.
 - [x] Commit Git — `1d39972` sudah dibuat dan disinkronkan ke `origin/main`.
 
-✅ **Selesai benar-benar kalau:** semua kotak §4 tercentang, yaitu aset dummy sudah diganti dengan aset final sebelum build Phase 6. 🕷️
+✅ **Selesai:** semua kotak §4 tercentang; aset final siap dipakai Phase 6/7. 🕷️

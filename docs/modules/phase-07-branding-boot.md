@@ -16,14 +16,13 @@ Plymouth memutar animasi dari gambar dan skrip kecil, bukan video.
 
 **Langkah 1: struktur tema**
 
-> ⚠️ **TODO sebelum build:** `assets-final/logo.png` masih **dummy** (400×400 transparan). Ganti dulu — lihat `docs/desain.md` §4.
+> ✅ **Aset final:** `assets-final/logo.png` sudah 400×400 transparan.
 
 ```bash
 cd ~/spideros
 INC=config/includes.chroot_after_packages
 PLY=$INC/usr/share/plymouth/themes/spiderman
 mkdir -p $PLY
-# TODO: ganti dummy
 cp assets-final/logo.png $PLY/logo.png
 ```
 
@@ -111,10 +110,9 @@ Ganti file gambar yang ditemukan:
 
 Contoh (sesuaikan path hasil `find`):
 
-> ⚠️ **TODO sebelum build:** `isolinux-splash.png` dan `grub-bg.png` masih **dummy**; ukuran/format harus sama seperti file aslinya. Lihat `docs/desain.md` §4.
+> ✅ **Aset final:** `isolinux-splash.png` 640×480 dan `grub-bg.png` 1920×1080 sudah sesuai.
 
 ```bash
-# TODO: ganti dummy
 cp assets-final/isolinux-splash.png config/bootloaders/isolinux/splash.png
 # GRUB, kalau ada splash.png di foldernya:
 cp assets-final/grub-bg.png config/bootloaders/grub-pc/splash.png

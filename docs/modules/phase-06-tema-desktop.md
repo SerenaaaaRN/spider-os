@@ -28,7 +28,7 @@ mkdir -p $INC/etc/skel/.config/autostart
 
 ### 6.2 Salin aset
 
-> ⚠️ **TODO sebelum build:** aset di `assets-final/` masih **dummy**. Ganti dengan aset final sesuai `docs/desain.md` §4 dan `assets-final/README-GANTI-ASET.txt` sebelum menjalankan phase ini di VM.
+> ✅ **Aset final:** `assets-final/wallpaper.png` dan `login.png` sudah 1920×1080. Tinggal disalin saat build.
 
 ```bash
 INC=config/includes.chroot_after_packages

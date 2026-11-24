@@ -11,7 +11,7 @@ Tujuannya:
 - **Spider-Sense**, tool Rust std-only yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka ANSI real-time — komponen koding inti proyek.
 - Dokumentasi yang langsung dipakai sebagai bahan BAB III, IV, dan V laporan.
 
-Build dilakukan di VM Debian 13 (`[BUILD-VM]`), uji boot di VM test BIOS/UEFI (`[TEST-VM]`), sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. Pengerjaan saat ini berada di Phase 4.
+Build dilakukan di VM Debian 13 (`[BUILD-VM]`), uji boot di VM test BIOS/UEFI (`[TEST-VM]`), sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. Phase 4 selesai; pengerjaan berikutnya Phase 5.
 
 Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modul_guide.md` berisi versi gabungan, dipakai bila seluruh modul dibutuhkan dalam satu file.
 
@@ -23,7 +23,7 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 1 — Persiapan lingkungan, repo, dokumentasi | [`modules/phase-01-persiapan.md`](modules/phase-01-persiapan.md) | ✅ Selesai |
 | Phase 2 — Build ISO baseline | [`modules/phase-02-baseline.md`](modules/phase-02-baseline.md) | ✅ Selesai |
 | Phase 3 — Uji baseline di VM (BIOS/UEFI) | [`modules/phase-03-uji-baseline.md`](modules/phase-03-uji-baseline.md) | ✅ Selesai |
-| Phase 4 — Desain aset visual | [`modules/phase-04-desain-aset.md`](modules/phase-04-desain-aset.md) | ⚠️ Sebagian — aset masih placeholder |
+| Phase 4 — Desain aset visual | [`modules/phase-04-desain-aset.md`](modules/phase-04-desain-aset.md) | ✅ Selesai |
 | Phase 5 — Paket, user live, keamanan dasar | [`modules/phase-05-paket-sistem.md`](modules/phase-05-paket-sistem.md) | ⬜ Belum |
 | Phase 6 — Tema desktop | [`modules/phase-06-tema-desktop.md`](modules/phase-06-tema-desktop.md) | ⬜ Belum |
 | Phase 7 — Branding boot (Plymouth, boot menu) | [`modules/phase-07-branding-boot.md`](modules/phase-07-branding-boot.md) | ⬜ Belum |
