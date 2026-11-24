@@ -4,6 +4,7 @@
 set -e
 VER="${1:-dev}"
 cd "$(dirname "$0")/.."
+./scripts/stage-spider-sense.sh
 sudo lb clean
 sudo lb config
 sudo lb build 2>&1 | tee build.log
