@@ -52,7 +52,11 @@ Daftar lengkap paket tambahan di luar baseline XFCE live-build:
 | Firmware | `firmware-linux`, `firmware-linux-nonfree`, `firmware-misc-nonfree`, `firmware-iwlwifi`, `firmware-realtek`, `firmware-atheros`, `firmware-brcm80211`, `firmware-amd-graphics`, `intel-microcode`, `amd64-microcode` |
 | Build-only | `cargo`, `rustc`, `build-essential` — di-`purge` oleh hook `0400`, tidak ikut ISO |
 
+<<<<<<< HEAD
 Paket untuk komik, media, dan game berada di package list terpisah: `content.list.chroot` dan `games.list.chroot`. Keduanya sudah masuk ISO final; item uji 18–21 di `docs/catatan.md` berstatus lulus.
+=======
+Paket untuk komik, media, dan game berada di package list terpisah: `content.list.chroot` dan `games.list.chroot`. Keduanya dibuat setelah audit akhir, sehingga **menunggu rebuild** supaya masuk ISO; item uji 18–21 di `docs/catatan.md` ditandai demikian.
+>>>>>>> 88ca3510fed5548cfe4e009c90d89e8c94e58282
 
 `policykit-1-gnome` tidak dipasang karena sudah dihapus dari trixie — diganti `polkitd` + `lxpolkit`. `neofetch` juga tidak tersedia di trixie — digantikan oleh mode snapshot Spider-Sense.
 
@@ -161,7 +165,12 @@ Tidak ada paket bawaan Debian yang dihapus secara eksplisit; perubahan bersifat 
 
 - [ ] Data performa (RAM idle, waktu boot, jumlah proses)
 - [ ] Output CLI Spider-Sense lengkap (`file`, `--version`, toolchain bersih)
+<<<<<<< HEAD
 - [x] Uji aplikasi: Firefox, VLC, mcomix, game, mpv, audacious
+=======
+- [ ] Rebuild ISO sekali lagi supaya Phase 9.5/9.6 masuk
+- [ ] Uji aplikasi: Firefox, VLC, mcomix, game, mpv, audacious
+>>>>>>> 88ca3510fed5548cfe4e009c90d89e8c94e58282
 - [ ] Phase 11: flash USB dan uji hardware
 - [ ] Foto kerja tim, video demo, panduan pengguna
 - [ ] Tag Git `v1.0` dan freeze Phase 12 (butuh izin eksplisit)
