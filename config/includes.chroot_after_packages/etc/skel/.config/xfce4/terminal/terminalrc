@@ -1,0 +1,8 @@
+[Configuration]
+FontName=Fira Code 11
+MiscAlwaysShowTabs=FALSE
+MiscMenubarDefault=FALSE
+ColorForeground=#ffd7af
+ColorBackground=#17100f
+ColorCursor=#d78787
+ColorPalette=#17100f;#870000;#87af87;#d7af5f;#af8787;#d78787;#ffd7af;#f3e2cf;#4a3a35;#ad1414;#a7cfa7;#e8c775;#d7af87;#e8a0a0;#ffe8c8;#fff5e6

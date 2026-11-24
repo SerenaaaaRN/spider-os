@@ -1,0 +1,33 @@
+#!/bin/bash
+# Pengganti neofetch untuk Debian 13 (paketnya sudah dihapus dari repo trixie).
+# Mencetak ASCII SpiderOS dan info sistem tanpa dependency tambahan.
+C1=$(printf '\033[31m')
+C2=$(printf '\033[33m')
+C0=$(printf '\033[0m')
+ASCII=/etc/skel/.config/neofetch/spider.txt
+
+if [ -f "$ASCII" ]; then
+    sed -e "s/\${c1}/$C1/g" -e "s/\${c2}/$C2/g" "$ASCII"
+else
+    printf '%s\n' "${C1}   /\\_/\\   ${C2}SpiderOS${C0}"
+fi
+
+line() {
+    printf '%s%-10s%s %s\n' "$C1" "$1" "$C0" "$2"
+}
+
+OS_NAME=$(. /etc/os-release 2>/dev/null && printf '%s' "${PRETTY_NAME:-SpiderOS}")
+CPU=$(awk -F: '/model name/{gsub(/^[ \t]+/, "", $2); print $2; exit}' /proc/cpuinfo)
+MEM_TOTAL=$(awk '/MemTotal/{printf "%.1f GiB", $2/1024/1024}' /proc/meminfo)
+MEM_AVAIL=$(awk '/MemAvailable/{printf "%.1f GiB", $2/1024/1024}' /proc/meminfo)
+UP=$(uptime -p 2>/dev/null || awk '{printf "%.0f hari", $1/86400}' /proc/uptime)
+
+printf '\n'
+line "OS:" "$OS_NAME"
+line "Kernel:" "$(uname -r)"
+line "Uptime:" "$UP"
+line "Shell:" "${SHELL##*/}"
+line "DE:" "${XDG_CURRENT_DESKTOP:-XFCE}"
+line "CPU:" "${CPU:-unknown}"
+line "Memory:" "${MEM_AVAIL} / ${MEM_TOTAL}"
+printf '\n'

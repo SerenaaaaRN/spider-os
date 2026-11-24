@@ -1,0 +1,12 @@
+#!/bin/bash
+# Membuat tema GTK "SpiderOS" dari Arc-Dark (Phase 6.3).
+set -e
+SRC=/usr/share/themes/Arc-Dark
+DST=/usr/share/themes/SpiderOS
+if [ -d "$SRC" ]; then
+  rm -rf "$DST"
+  cp -r "$SRC" "$DST"
+  find "$DST" -type f \( -name '*.css' -o -name 'gtkrc' -o -name '*.svg' -o -name 'themerc' -o -name '*.scss' \) \
+    -exec sed -i -e 's/#5294E2/#870000/Ig' -e 's/rgba(82, *148, *226/rgba(135, 0, 0/Ig' {} +
+  sed -i 's/Arc-Dark/SpiderOS/g' "$DST/index.theme" || true
+fi

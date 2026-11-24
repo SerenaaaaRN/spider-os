@@ -1,0 +1,19 @@
+#!/bin/bash
+# Set wallpaper sekali per user. Nama monitor dibaca dari xrandr supaya
+# bebas di VM maupun laptop.
+IMG="/usr/share/backgrounds/spiderman/wallpaper.png"
+MARK="$HOME/.cache/spideros-wallpaper-set"
+[ -f "$MARK" ] && exit 0
+[ -f "$IMG" ] || exit 0
+sleep 3
+OUTS="$(xrandr --query | awk '/ connected/ {print $1}') 0"
+for out in $OUTS; do
+  for ws in 0 1 2 3; do
+    P="/backdrop/screen0/monitor${out}/workspace${ws}"
+    xfconf-query -c xfce4-desktop -p "$P/last-image"  -n -t string -s "$IMG"
+    xfconf-query -c xfce4-desktop -p "$P/image-style" -n -t int -s 5
+    xfconf-query -c xfce4-desktop -p "$P/color-style" -n -t int -s 0
+  done
+done
+mkdir -p "$(dirname "$MARK")"
+touch "$MARK"

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=SpiderOS
+Description=Boot splash bertema Spider-Man
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/spiderman
+ScriptFile=/usr/share/plymouth/themes/spiderman/spiderman.script

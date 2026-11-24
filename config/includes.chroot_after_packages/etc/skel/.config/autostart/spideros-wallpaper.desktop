@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=SpiderOS Wallpaper
+Exec=/usr/local/bin/spideros-wallpaper
+X-GNOME-Autostart-enabled=true

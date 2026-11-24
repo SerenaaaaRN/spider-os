@@ -63,29 +63,7 @@ Alternatif: ubah logo kamu otomatis jadi ASCII lalu simpan ke `spider.txt`:
 jp2a --width=40 --colors assets-final/logo.png > $NF/spider.txt
 ```
 
-Konfigurasi neofetch:
-
-```bash
-cat > $NF/config.conf <<'EOF'
-print_info() {
-    info title
-    info underline
-    info "OS" distro
-    info "Kernel" kernel
-    info "Uptime" uptime
-    info "Packages" packages
-    info "Shell" shell
-    info "DE" de
-    info "CPU" cpu
-    info "Memory" memory
-}
-image_backend="ascii"
-image_source="/etc/skel/.config/neofetch/spider.txt"
-ascii_colors=(1 3)
-title_fqdn="off"
-memory_percent="on"
-EOF
-```
+Perintah `neofetch` di SpiderOS adalah skrip di `/usr/local/bin/neofetch`, bukan paket Debian — `neofetch` sudah dihapus dari repositori trixie. Skrip itu membaca `spider.txt` di atas dan mengambil info sistem langsung dari `/proc`.
 
 ### 8.3 Prompt bash dan alias (`.bash_aliases`)
 

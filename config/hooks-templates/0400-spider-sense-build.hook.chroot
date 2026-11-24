@@ -1,0 +1,32 @@
+#!/bin/bash
+# Kompilasi Spider-Sense di dalam chroot, lalu bersihkan toolchain build.
+set -e
+
+SRC=/opt/spider-sense-src
+BIN=/usr/local/bin/spider-sense
+
+if [ ! -f "$SRC/Cargo.toml" ]; then
+    echo "ERROR: sumber Rust tidak ditemukan di $SRC" >&2
+    exit 1
+fi
+
+cd "$SRC"
+cargo build --release --locked --offline
+install -m 0755 target/release/spider-sense "$BIN"
+strip "$BIN" || true
+
+# Smoke test ringan selalu jalan; --once butuh /proc yang ter-mount di chroot.
+"$BIN" --version
+if [ -d /proc/self ]; then
+    "$BIN" --once --no-color
+else
+    echo "INFO: /proc tidak tersedia di chroot; smoke test --once dilewati"
+fi
+
+cd /
+rm -rf "$SRC"
+
+# Toolchain hanya dipakai saat build, jangan ikut ke ISO.
+apt-get purge -y --auto-remove cargo rustc build-essential || true
+apt-get clean
+rm -rf /var/lib/apt/lists/*

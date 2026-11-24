@@ -14,7 +14,8 @@ xorg
 lightdm
 lightdm-gtk-greeter
 dbus-x11
-policykit-1-gnome
+polkitd
+lxpolkit
 xdg-user-dirs
 gvfs
 gvfs-backends

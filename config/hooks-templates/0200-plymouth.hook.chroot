@@ -1,0 +1,5 @@
+#!/bin/bash
+# Mengaktifkan tema Plymouth SpiderOS (Phase 7.1).
+set -e
+plymouth-set-default-theme spiderman
+update-initramfs -u -k all

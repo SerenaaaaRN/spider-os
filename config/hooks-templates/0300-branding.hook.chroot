@@ -1,0 +1,19 @@
+#!/bin/bash
+# Identitas sistem SpiderOS (Phase 8.1).
+set -e
+# /etc/os-release di Debian 13 adalah symlink ke /usr/lib/os-release
+OSR=/usr/lib/os-release
+sed -i 's/^NAME=.*/NAME="SpiderOS"/'                                        $OSR
+sed -i 's/^PRETTY_NAME=.*/PRETTY_NAME="SpiderOS 1.0 (berbasis Debian 13)"/'  $OSR
+sed -i 's/^HOME_URL=.*/HOME_URL="https:\/\/www.debian.org\/"/'               $OSR
+
+cat > /etc/issue <<'BANNER'
+SpiderOS 1.0 (Debian 13 Trixie) \n \l
+BANNER
+cp /etc/issue /etc/issue.net
+
+cat > /etc/motd <<'BANNER'
+  Selamat datang di SpiderOS.
+  Dengan kekuatan besar datang tanggung jawab besar.
+  Ketik `sense` untuk memeriksa kondisi sistem.
+BANNER
