@@ -52,7 +52,7 @@ git tag v1.0
 sha256sum dist/spideros-v1.0.iso
 ```
 
-Buat `docs/RELEASE_NOTES.md` berisi: versi, tanggal, isi paket utama, fitur tema, fitur Spider-Sense (`--once`, `--watch`, `--no-color`), keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
+Buat `docs/release_notes.md` berisi: versi, tanggal, isi paket utama, fitur tema, fitur Spider-Sense (`--once`, `--watch`, `--no-color`), keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
 
 Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk lain), plus satu flashdisk bootable siap presentasi.
 

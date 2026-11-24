@@ -2260,7 +2260,7 @@ git tag v1.0
 sha256sum dist/spideros-v1.0.iso
 ```
 
-Buat `docs/RELEASE_NOTES.md` berisi: versi, tanggal, isi paket utama, fitur tema, fitur Spider-Sense (`--once`, `--watch`, `--no-color`), keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
+Buat `docs/release_notes.md` berisi: versi, tanggal, isi paket utama, fitur tema, fitur Spider-Sense (`--once`, `--watch`, `--no-color`), keterbatasan (Secure Boot, tanpa installer, driver NVIDIA proprietary tidak ada), username dan password live.
 
 Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk lain), plus satu flashdisk bootable siap presentasi.
 
@@ -2327,7 +2327,7 @@ Tulis alasan singkat di Bab III:
 
 ### 13.3 Panduan pengguna (tujuan penelitian poin 3)
 
-Buat `docs/PANDUAN_PENGGUNA.md`:
+Buat `docs/panduan_pengguna.md`:
 - Apa itu SpiderOS dan siapa target penggunanya
 - Persyaratan (flashdisk 4 GB, laptop x86-64, RAM minimal 2 GB)
 - Cara membuat flashdisk (Rufus/Etcher)
@@ -2525,7 +2525,7 @@ spideros/
  ├── dist/                                  # ISO hasil (tidak di-commit)
  └── docs/
      ├── catatan.md, bug-log.md, desain.md
-     ├── RELEASE_NOTES.md, PANDUAN_PENGGUNA.md
+     ├── release_notes.md, panduan_pengguna.md, laporan.md
      └── screenshots/
 ```
 

@@ -50,7 +50,7 @@ Tulis alasan singkat di Bab III:
 
 ### 13.3 Panduan pengguna (tujuan penelitian poin 3)
 
-Buat `docs/PANDUAN_PENGGUNA.md`:
+Buat `docs/panduan_pengguna.md`:
 - Apa itu SpiderOS dan siapa target penggunanya
 - Persyaratan (flashdisk 4 GB, laptop x86-64, RAM minimal 2 GB)
 - Cara membuat flashdisk (Rufus/Etcher)

@@ -50,7 +50,7 @@ spideros/
  ├── dist/                                  # ISO hasil (tidak di-commit)
  └── docs/
      ├── catatan.md, bug-log.md, desain.md
-     ├── RELEASE_NOTES.md, PANDUAN_PENGGUNA.md
+     ├── release_notes.md, panduan_pengguna.md, laporan.md
      └── screenshots/
 ```
 
