@@ -26,13 +26,13 @@ spideros/
  │       │       ├── .bash_aliases
  │       │       └── .config/
  │       │           ├── autostart/spideros-wallpaper.desktop
- │       │           ├── neofetch/{config.conf,spider.txt}
  │       │           └── xfce4/
  │       │               ├── terminal/terminalrc
  │       │               └── xfconf/xfce-perchannel-xml/{xsettings.xml,xfwm4.xml}
  │       ├── opt/spider-sense-src/           # staging generated (gitignored)
  │       └── usr/
- │           ├── local/bin/spideros-wallpaper
+ │           ├── local/bin/spideros-wallpaper        # skrip wallpaper
+ │           └── local/bin/neofetch                # symlink dibuat hook 0300 (tidak di repo)
  │           ├── share/applications/
  │           │   ├── spider-sense.desktop
  │           │   ├── spideros-comics.desktop

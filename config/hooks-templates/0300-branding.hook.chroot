@@ -17,3 +17,7 @@ cat > /etc/motd <<'BANNER'
   Dengan kekuatan besar datang tanggung jawab besar.
   Ketik `sense` untuk memeriksa kondisi sistem.
 BANNER
+
+# `neofetch` = mode snapshot dari binary Rust yang sama (cli::default_watch).
+# Target binary dipasang hook 0400; symlink boleh dibuat lebih dulu.
+ln -sf /usr/local/bin/spider-sense /usr/local/bin/neofetch

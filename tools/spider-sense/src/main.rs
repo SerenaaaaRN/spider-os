@@ -89,7 +89,7 @@ fn main() {
     enable_virtual_terminal();
 
     let mut colored = true;
-    let mut watch = true;
+    let mut watch = cli::default_watch();
 
     for arg in env::args().skip(1) {
         match arg.as_str() {

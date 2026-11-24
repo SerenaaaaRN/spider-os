@@ -9,9 +9,10 @@ Ini satu-satunya build penuh. Seluruh konfigurasi Phase 5–9 sudah disiapkan da
 
 ```bash
 cd ~/spideros
-sudo lb clean --purge
 ./scripts/build.sh v1.0-rc1
 ```
+
+`scripts/build.sh` menjalankan `sudo lb clean` (cache tetap dipakai), lalu `lb config` dan `lb build`. Tidak memakai `--purge`.
 
 Output: `dist/spideros-v1.0-rc1.iso` dan `dist/spideros-v1.0-rc1.iso.sha256`.
 

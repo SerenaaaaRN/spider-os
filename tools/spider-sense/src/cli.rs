@@ -36,6 +36,38 @@ pub(crate) fn env_terminal() -> String {
         .unwrap_or_else(|_| "unknown".into())
 }
 
+/// `neofetch` memanggil binary ini lewat symlink. Nama pemanggil yang
+/// menentukan mode default, bukan hardcode di `main`.
+fn is_neofetch_invocation(arg0: &str) -> bool {
+    Path::new(arg0)
+        .file_name()
+        .and_then(|name| name.to_str())
+        == Some("neofetch")
+}
+
+/// Mode awal: `neofetch` → satu frame (prompt balik), lainnya → live.
+pub(crate) fn default_watch() -> bool {
+    !is_neofetch_invocation(&env::args().next().unwrap_or_default())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_neofetch_invocation;
+
+    #[test]
+    fn neofetch_name_is_snapshot() {
+        assert!(is_neofetch_invocation("neofetch"));
+        assert!(is_neofetch_invocation("/usr/local/bin/neofetch"));
+    }
+
+    #[test]
+    fn other_names_are_live() {
+        assert!(!is_neofetch_invocation("spider-sense"));
+        assert!(!is_neofetch_invocation("/usr/local/bin/spider-sense"));
+        assert!(!is_neofetch_invocation(""));
+    }
+}
+
 const VERSION_LINE: &str = "spider-sense 1.0.0 (Rust, std-only)";
 
 const HELP_TEXT: &str = "\

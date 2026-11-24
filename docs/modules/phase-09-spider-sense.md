@@ -75,7 +75,7 @@ Kode dibagi menjadi beberapa modul agar mudah dijelaskan di laporan:
 2. **Parser `/proc`** (`parser.rs`) — fungsi murni yang menerima teks dan mengembalikan struktur data.
 3. **Sampler CPU** (`sampler.rs`) — menyimpan sampel sebelumnya dan menghitung delta.
 4. **Renderer ANSI** (`render/`) — menyusun frame, progress bar, warna, dan kontrol layar.
-5. **Unit test** — 13 test: `parser.rs` (7), `metrics.rs` (4), `sampler.rs` (1), dan `render/mod.rs` (1).
+5. **Unit test** — 15 test: `parser.rs` (7), `metrics.rs` (4), `sampler.rs` (1), `render/mod.rs` (1), dan `cli.rs` (2 untuk deteksi nama pemanggil `neofetch`).
 
 Saat build, sumber disalin sementara ke `config/includes.chroot_after_packages/opt/spider-sense-src/` agar dapat diakses hook di dalam chroot. Direktori staging ini bersifat generated dan tidak di-commit; sumber asli tetap di `tools/spider-sense/`.
 

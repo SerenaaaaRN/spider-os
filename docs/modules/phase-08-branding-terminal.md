@@ -1,7 +1,7 @@
 ## PHASE 8: Branding Terminal dan Identitas Sistem
 
 **Tujuan:** terminal, `neofetch`, dan identitas sistem terlihat sebagai SpiderOS.
-**Output:** `neofetch` dengan ASCII laba-laba, prompt bash custom, `os-release` dan banner login.
+**Output:** `neofetch` sebagai mode snapshot Spider-Sense (satu sumber dengan Rust), prompt bash custom, `os-release` dan banner login.
 
 ### 8.1 Identitas sistem (`os-release`, `issue`, `motd`)
 
@@ -32,44 +32,31 @@ EOF
 chmod +x config/hooks/live/0300-branding.hook.chroot
 ```
 
-### 8.2 `neofetch` dengan ASCII laba-laba
+### 8.2 `neofetch` = mode snapshot Spider-Sense
+
+`neofetch` sudah dihapus dari repositori trixie, jadi tidak diinstall sebagai paket. Di SpiderOS, perintah itu adalah **symlink ke binary Rust** `spider-sense`, dibuat oleh hook branding:
 
 ```bash
-INC=config/includes.chroot_after_packages
-NF=$INC/etc/skel/.config/neofetch
-mkdir -p $NF
+# config/hooks-templates/0300-branding.hook.chroot
+ln -sf /usr/local/bin/spider-sense /usr/local/bin/neofetch
 ```
 
-ASCII sederhana (`${c1}` maroon, `${c2}` krem — neofetch hanya mendukung 8 warna, jadi ini pendekatan terdekat dari palet 256-color Spider-Sense):
+Binary yang sama memilih mode dari nama pemanggil (`cli::default_watch()` di `main.rs`):
 
-```bash
-cat > $NF/spider.txt <<'EOF'
-${c1}      \  \     /  /
-       \  \   /  /
-  ______\  \_/  /______
-  \      \ (${c2}O${c1}) /      /
-   `-.___/ / \ \___.-'
-      _.-'  |  '-._
-     /     / \     \
-    /  .-'/   \'-.  \
-   '__/  /     \  \__'
-${c2}       SpiderOS
-EOF
-```
+| Dipanggil sebagai | Mode | Keluar |
+|---|---|---|
+| `neofetch` | satu frame (`--once`) | prompt langsung balik |
+| `sense` (alias) | live (`--watch`) | Ctrl+C |
+| `spider-sense` | live (`--watch`) | Ctrl+C |
 
-Alternatif: ubah logo kamu otomatis jadi ASCII lalu simpan ke `spider.txt`:
-
-```bash
-jp2a --width=40 --colors assets-final/logo.png > $NF/spider.txt
-```
-
-Perintah `neofetch` di SpiderOS adalah skrip di `/usr/local/bin/neofetch`, bukan paket Debian — `neofetch` sudah dihapus dari repositori trixie. Skrip itu membaca `spider.txt` di atas dan mengambil info sistem langsung dari `/proc`.
+Jadi ASCII (`SPIDER_ART` di `render/art.rs`), palet (`render/ansi.rs`), dan Status berasal dari **satu sumber**. Tidak ada `spider.txt` dan tidak ada warna hardcode di shell.
 
 ### 8.3 Prompt bash dan alias (`.bash_aliases`)
 
 Debian memuat `~/.bash_aliases` otomatis dari `.bashrc`, jadi kita tidak perlu menimpa `.bashrc`.
 
 ```bash
+INC=config/includes.chroot_after_packages
 cat > $INC/etc/skel/.bash_aliases <<'EOF'
 # Prompt SpiderOS: [user@host dir] dengan palet hangat Spider-Sense
 # 88 maroon, 180 sand, 223 cream — sama seperti render/ansi.rs
@@ -118,7 +105,7 @@ neofetch
 echo $PS1
 ```
 
-- [ ] `neofetch` menampilkan ASCII laba-laba dan nama "SpiderOS"
+- [ ] `neofetch` menampilkan ASCII SpiderOS + Status, lalu prompt langsung balik
 - [ ] Prompt berwarna maroon-krem
 - [ ] Warna terminal gelap dengan kursor rose
 
@@ -128,7 +115,7 @@ echo $PS1
 
 | Gejala | Solusi |
 |---|---|
-| `neofetch` tidak memakai ASCII kita | Cek `image_source` path, cek `ls -l /etc/skel/.config/neofetch/spider.txt` |
+| `neofetch` tidak menampilkan frame Spider-Sense | Cek `ls -l /usr/local/bin/neofetch` — harus symlink ke `/usr/local/bin/spider-sense` |
 | Prompt tidak berubah | Pastikan `.bash_aliases` ada di `~` (`ls -a ~`), buka terminal baru |
 | Nama OS tetap "Debian" | Cek hook 0300 di `build.log`, cek `cat /usr/lib/os-release` |
 | Warna ASCII aneh | Sesuaikan `ascii_colors=(1 3)` (1 merah, 3 kuning — pendekatan 8 warna untuk maroon/krem) |
