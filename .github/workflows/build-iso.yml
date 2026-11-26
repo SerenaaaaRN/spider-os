@@ -58,16 +58,46 @@ jobs:
           echo "== live-build =="; lb --version || true
           echo "== kernel =="; uname -a
 
-      - name: Prepare hooks
+      - name: Prepare hooks and auto scripts
         run: |
-          chmod +x scripts/*.sh
+          # auto/* wajib executable supaya lb config/build/clean tidak
+          # melewati opsi kustom (archive areas non-free-dll, bootappend, dll).
+          chmod +x auto/* scripts/*.sh
           ./scripts/install-hooks.sh
+          ls -l auto/
 
       - name: Build ISO
         run: |
           VERSION="${{ github.event.inputs.version || github.ref_name }}"
           echo "Building SpiderOS version: $VERSION"
           ./scripts/build.sh "$VERSION"
+
+      - name: Konfigurasi yang terpakai
+        if: always()
+        run: |
+          echo "== archive areas / distribusi =="
+          grep -hE '^LB_(ARCHIVE_AREAS|DISTRIBUTION)=' config/common config/chroot 2>/dev/null || true
+
+      - name: Diagnosa kegagalan build
+        if: failure()
+        run: |
+          # Annotation ::error:: tampil di halaman job publik tanpa perlu login.
+          echo "::error::=== build.log (80 baris terakhir) ==="
+          if [ -f build.log ]; then
+            tail -n 80 build.log \
+              | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/^/::error::/' || true
+          else
+            echo "::error::build.log tidak dibuat — kegagalan terjadi sebelum lb build"
+          fi
+
+      - name: Upload build log saat gagal
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.run_number }}
+          path: build.log
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Verify ISO
         run: |
