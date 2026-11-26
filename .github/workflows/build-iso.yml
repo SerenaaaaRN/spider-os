@@ -1,0 +1,84 @@
+name: Build ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Label versi ISO (mis. v1.0)"
+        required: false
+        default: "dev"
+  push:
+    tags:
+      - "v*"
+      - "ci-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iso-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    container:
+      # Harus Debian trixie (sama dengan target) dan privileged agar
+      # live-build bisa mount/losetup/mknod saat membuat squashfs + ISO.
+      image: debian:trixie
+      options: --privileged
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            git ca-certificates sudo live-build debootstrap \
+            xorriso mtools squashfs-tools dosfstools fakeroot \
+            syslinux syslinux-common isolinux \
+            grub-pc-bin grub-efi-amd64-bin grub-common grub2-common \
+            rsync xz-utils bzip2 cpio wget gnupg file
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Provision loop devices and show environment
+        run: |
+          [ -e /dev/loop-control ] || mknod /dev/loop-control c 10 237 || true
+          for i in $(seq 0 7); do
+            [ -e "/dev/loop$i" ] || mknod "/dev/loop$i" b 7 "$i" || true
+          done
+          echo "== disk =="; df -h /
+          echo "== live-build =="; lb --version || true
+          echo "== kernel =="; uname -a
+
+      - name: Prepare hooks
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/install-hooks.sh
+
+      - name: Build ISO
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          echo "Building SpiderOS version: $VERSION"
+          ./scripts/build.sh "$VERSION"
+
+      - name: Verify ISO
+        run: |
+          ls -lh dist/
+          sha256sum -c dist/*.sha256
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spideros-iso-${{ github.run_number }}
+          path: |
+            dist/*.iso
+            dist/*.sha256
+          retention-days: 14
