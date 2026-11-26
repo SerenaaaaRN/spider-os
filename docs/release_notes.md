@@ -40,10 +40,18 @@
 - 15 unit test lulus
 - Dikompilasi di dalam chroot saat build oleh hook `0400`, lalu toolchain dibuang agar tidak ikut ISO
 
-## Akun live
+## Akun dan keamanan
 
-- User: `spider`
-- Kata sandi: `live`
+Target pengguna: **penggemar Spider-Man / pengguna muda**.
+
+| Akun | Kata sandi | Hak akses |
+|---|---|---|
+| `spider` | `live` | User harian, auto-login, **tanpa sudo** |
+| `admin` | `admin123` | Anggota grup `sudo`, `audio`, `video`, `plugdev`, `bluetooth`, `dialout`, `cdrom`; bisa `sudo` |
+
+- Home masing-masing akun berizin `700`; aturan sudoers berizin `440` di `/etc/sudoers.d/99-spideros-no-sudo`.
+- Root dikunci (`passwd -l root`).
+- `ufw` aktif dengan kebijakan default: tolak koneksi masuk, izinkan koneksi keluar.
 - Hostname: `spideros`
 
 ## Verifikasi unduhan

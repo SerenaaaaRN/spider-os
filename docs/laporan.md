@@ -46,7 +46,7 @@ Sistem operasi merupakan perangkat lunak dasar yang mengelola sumber daya perang
 
 Debian merupakan distribusi Linux yang dikembangkan oleh komunitas Debian Project dan dikenal stabil serta memiliki siklus rilis yang teratur. Salah satu cara memanfaatkan Debian secara fleksibel adalah melalui remastering, yaitu proses mengambil distribusi yang sudah ada, menyesuaikan paket, konfigurasi, dan tampilannya, lalu membungkusnya kembali menjadi berkas image ISO baru. Remastering berbeda dengan membangun sistem dari awal seperti Linux From Scratch; proses ini memungkinkan pembuatan distro turunan dengan waktu dan kompleksitas yang jauh lebih rendah.
 
-Kegiatan remastering memberikan kesempatan bagi mahasiswa untuk memahami struktur internal sistem operasi, proses booting, pengelolaan paket, dan manajemen perangkat lunak secara langsung. Selain itu, remastering dapat dijadikan sarana kreatif untuk menghasilkan sistem operasi bertema tertentu. Proyek ini mengambil tema Spider-Man, salah satu karakter komik populer dengan penggemar di seluruh dunia, dengan tujuan menghasilkan distribusi live yang menarik bagi pengguna muda sekaligus tetap ringan, aman, dan edukatif.
+Kegiatan remastering memberikan kesempatan bagi mahasiswa untuk memahami struktur internal sistem operasi, proses booting, pengelolaan paket, dan manajemen perangkat lunak secara langsung. Selain itu, remastering dapat dijadikan sarana kreatif untuk menghasilkan sistem operasi bertema tertentu. Proyek ini mengambil tema Spider-Man, salah satu karakter komik populer dengan penggemar di seluruh dunia. **Target penggunanya adalah komunitas penggemar Spider-Man dan pengguna muda** yang ingin distribusi live dengan identitas visual kuat, ringan, aman, dan langsung dipakai tanpa instalasi. Target ini menentukan pilihan tema, aplikasi hiburan, kustomisasi DPI, dan mekanisme keamanan berbasis pemisahan akun yang dibahas di Bab III.
 
 Proses pengembangan dan pengujian dilakukan di dalam mesin virtual VMware Workstation. Penggunaan mesin virtual memungkinkan instalasi, konfigurasi, dan pengujian sistem hasil remastering dilakukan tanpa mengganggu sistem operasi utama pada komputer fisik. ISO yang dihasilkan bersifat hybrid dan dapat langsung di-boot dari flashdisk, baik pada firmware BIOS maupun UEFI, melalui bootloader ISOLINUX dan GRUB.
 
@@ -90,7 +90,7 @@ Batasan dalam proyek ini adalah sebagai berikut:
 3. Lingkungan desktop yang digunakan adalah XFCE 4.20 dengan LightDM.
 4. Tema yang diterapkan terbatas pada identitas visual Spider-Man buatan tim; tidak menggunakan aset resmi berhak cipta.
 5. Komik tidak disertakan di dalam ISO. Pengguna mengisi sendiri folder `/usr/share/spideros/comics/`.
-6. Pengujian booting dilakukan di mesin virtual; uji pada perangkat fisik masih menjadi pekerjaan lanjutan.
+6. Pengujian booting dilakukan di mesin virtual dan pada dua perangkat fisik (ASUS Vivobook dan Lenovo IdeaPad 82KC); uji pada perangkat tambahan masih menjadi pekerjaan lanjutan.
 
 ## 1.6 Sistematika Penulisan
 
@@ -202,12 +202,28 @@ Sistem yang dihasilkan harus mampu:
 3. Menyediakan aplikasi produktivitas, hiburan offline, pembaca komik, dan game.
 4. Menjalankan Spider-Sense dalam mode live maupun snapshot.
 5. Dibangun ulang dari repositori secara reproducible.
+6. Memisahkan akun harian (`spider`, tanpa hak admin) dan akun administrasi (`admin`, punya `sudo`) sebagai bentuk keamanan.
+7. Menolak koneksi jaringan masuk secara default lewat `ufw`.
+
+### 3.1.4 Target pengguna dan pemetaan kebutuhan
+
+Target utama adalah penggemar Spider-Man / pengguna muda. Kebutuhan mereka dipetakan ke keputusan rancangan sebagai berikut:
+
+| Kebutuhan target | Keputusan rancangan |
+|---|---|
+| Identitas visual bertema | Wallpaper, logo, Plymouth, ikon, dan palet Spider-Sense |
+| Kemudahan pakai harian | Auto-login `spider`, tap-to-click, DPI 120 |
+| Hiburan ringan | `mcomix`, `mpv`, `audacious`, game, folder komik pengguna |
+| Rasa "Spider-Sense" | Aplikasi Rust pembaca `/proc` |
+| Keamanan pemakaian awam | Dua akun berbeda hak + `ufw` aktif |
 
 ## 3.2 Perancangan Sistem
 
 ### 3.2.1 Persiapan Remastering
 
 Source proyek disimpan di Git dengan struktur `auto/`, `config/`, `scripts/`, `tools/`, `docs/`, dan `assets-final/`. Folder kerja build berada di path native VM `~/spider-os-build`, sedangkan folder bersama `/mnt/hgfs/SpiderOS-Share/spider-os` hanya dipakai untuk artefak ISO, log, dan screenshot.
+
+Seluruh struktur codebase proyek dirancang mengikuti konvensi resmi **live-build** dan **Debian Live Manual**, bukan dibuat dari nol. Direktori `auto/` diadaptasi dari contoh yang disediakan paket `live-build` (`/usr/share/doc/live-build/examples/auto/`), sedangkan `config/package-lists/`, `config/hooks/live/`, dan `config/includes.chroot_after_packages/` adalah direktori standar yang dikenali oleh `lb config` dan `lb build` sesuai dokumentasi `live-build(7)`. Alur build mengikuti empat tahap resmi — config, bootstrap, chroot, binary — dan penamaan berkas `*.list.chroot`/`*.hook.chroot` juga mengikuti aturan tersebut. Di atas kerangka resmi itu, tim menambahkan komponen sendiri: `config/hooks-templates/` sebagai sumber hook terlacak, `scripts/` sebagai pembungkus build dan sinkronisasi, aset visual, serta aplikasi Spider-Sense.
 
 Semua hook disimpan sebagai template terlacak di `config/hooks-templates/`. Di VM, skrip `scripts/install-hooks.sh` menyalinnya ke `config/hooks/live/`. Skrip `scripts/setup-bootloaders.sh` mengisi splash dan warna ISOLINUX/GRUB setelah `lb config`.
 
@@ -243,7 +259,7 @@ Alur build adalah sebagai berikut:
 3. `lb config` menghasilkan konfigurasi live-build.
 4. `lb build` menjalankan bootstrap, chroot, dan binary stage.
 5. Hook `0050` mengatur sistem dasar, `0100` tema, `0200` Plymouth, `0300` branding, dan `0400` mengompilasi Spider-Sense lalu membuang toolchain.
-6. ISO hasil di-rename menjadi `spideros-v1.iso` dan dibuat berkas `.sha256`-nya.
+6. ISO hasil di-rename menjadi `spideros-<versi>.iso` dan dibuat berkas `.sha256`-nya.
 
 Strategi yang dipakai adalah satu build final untuk rilis, bukan build pada setiap fase.
 
@@ -252,6 +268,19 @@ Strategi yang dipakai adalah satu build final untuk rilis, bukan build pada seti
 Spider-Sense terdiri dari delapan modul: `main`, `cli`, `model`, `parser`, `procfs`, `metrics`, `sampler`, dan `render`. Modul `render` dibagi lagi menjadi `art.rs` untuk seni ASCII, `ansi.rs` untuk palet warna, dan `mod.rs` untuk perakitan frame.
 
 Opsi baris perintah yang tersedia adalah `--watch`, `--once`, `--no-color`, `--help`, dan `--version`. Fungsi `cli::default_watch()` memilih mode berdasarkan nama pemanggil, sehingga satu biner dapat berperan sebagai `neofetch` maupun `spider-sense`. Status sistem ditampilkan sebagai Tenang, Waspada, atau BAHAYA berdasarkan ambang penggunaan CPU dan RAM.
+
+### 3.2.6 Perancangan akun, hak akses, dan keamanan
+
+| Akun | Kata sandi | Grup | Hak |
+|---|---|---|---|
+| `spider` | `live` | grup perangkat dari `live-config` | User harian; **tidak boleh menjalankan `sudo`** |
+| `admin` | `admin123` | `sudo`, `audio`, `video`, `plugdev`, `bluetooth`, `dialout`, `cdrom` | Administrator; satu-satunya yang bisa `sudo` |
+
+Akun `admin` dibuat oleh hook `0060-users.hook.chroot` pada tahap chroot. Root dikunci dengan `passwd -l root`. Aturan `/etc/sudoers.d/99-spideros-no-sudo` (mode `440`) menimpa kebijakan grup `sudo` bawaan yang memasukkan `spider`, sehingga pemakai harian tidak bisa mengubah sistem. Home tiap akun berizin `700` dan dimiliki oleh akunnya masing-masing.
+
+LightDM dikonfigurasi dengan `autologin-user=spider` dan `autologin-user-timeout=0`, sehingga target pengguna masuk langsung ke desktop. Bila sesi di-logout, layar login menampilkan kedua akun.
+
+`ufw` diaktifkan saat build dengan kebijakan menolak koneksi masuk dan mengizinkan koneksi keluar. Tidak ada port yang sengaja dibuka karena SpiderOS tidak menjalankan layanan server.
 
 ## 3.3 Hasil yang Diharapkan
 
@@ -264,7 +293,7 @@ Hasil yang diharapkan adalah berkas ISO hybrid berukuran sekitar 1,8 GB yang dap
 
 ## 4.1 Lingkungan Pengembangan
 
-Build dijalankan di VM Debian 13 pada path native `~/spider-os-build`. Hasil build terakhir menunjukkan pesan `P: Build completed successfully` pada `build.log`. ISO akhir bernama `spideros-v1.iso` dengan ukuran 1.930.952.704 byte dan SHA-256 `8eac0f45a948f01c671dbac81e5654153ed3c4d58c28173cc74df9a4965a74ca`, yang sudah diverifikasi cocok di host Windows.
+Build dijalankan di VM Debian 13 pada path native `~/spider-os-build` dan, sebagai jalur alternatif, melalui GitHub Actions (`.github/workflows/build-iso.yml`). Hasil build terakhir menunjukkan pesan `P: Build completed successfully` pada `build.log`. ISO terbaru yang terverifikasi adalah `spideros-v2.iso` dengan ukuran 1.936.654.336 byte dan SHA-256 `9ba567cc4a240a90e28444b8bcc81691d1735190c3aed0456566b607c556199d`, yang sudah diverifikasi cocok di host Windows.
 
 Spesifikasi sistem hasil:
 
@@ -273,8 +302,8 @@ Spesifikasi sistem hasil:
 | Basis | Debian 13 (trixie) |
 | Kernel | 6.12.118+deb13-amd64 |
 | Desktop | XFCE 4.20 dengan LightDM |
-| User live | `spider` |
-| Kata sandi | `live` |
+| User harian | `spider` (kata sandi `live`, tanpa sudo) |
+| User administrator | `admin` (kata sandi `admin123`, bergrup `sudo`) |
 | Hostname | `spideros` |
 | Arsitektur | amd64, ISO hybrid untuk BIOS dan UEFI |
 
@@ -336,8 +365,13 @@ Pengujian dilakukan di TEST-VM setelah build final. Hasilnya dirangkum dalam 21 
 | 19 | Folder komik tersedia | Lulus | Folder dan README ada di ISO |
 | 20 | Game dari repo terbuka | Lulus | Mines, Sudoku, Bastet, NetHack |
 | 21 | mpv dan audacious terbuka | Lulus | Keduanya jalan dari menu |
+| 22 | Auto-login sebagai `spider` | Lulus | Berhasil di ASUS Vivobook dan Lenovo 82KC |
+| 23 | Akun `admin` bisa `sudo` | Menunggu build Phase 13 | Diverifikasi dengan `sudo -l -U admin` |
+| 24 | `spider` tidak bisa `sudo` | Menunggu build Phase 13 | Diverifikasi dengan `sudo -l -U spider` |
+| 25 | `sudo ufw status` | Lulus | `Status: active`, koneksi masuk ditolak |
+| 26 | Hak akses home & sudoers | Menunggu build Phase 13 | Home `700`, sudoers `440` |
 
-Untuk menjawab rumusan masalah keempat, ISO hybrid dibangun dengan MBR/ISOLINUX untuk BIOS dan partisi EFI/GRUB untuk UEFI. Flashdisk dapat dibuat dengan Rufus atau Balena Etcher; apabila firmware membatasi boot, Secure Boot perlu dimatikan sementara. Prosedur lengkap dan matriks uji perangkat fisik tersedia di `docs/modules/phase-11-usb-hardware.md`, namun pengujian pada laptop fisik belum dilaksanakan pada saat laporan ini disusun.
+Untuk menjawab rumusan masalah keempat, ISO hybrid dibangun dengan MBR/ISOLINUX untuk BIOS dan partisi EFI/GRUB untuk UEFI. Flashdisk dapat dibuat dengan Rufus atau Balena Etcher; apabila firmware membatasi boot, Secure Boot perlu dimatikan sementara. Prosedur lengkap dan matriks uji perangkat fisik tersedia di `docs/modules/phase-11-usb-hardware.md`. Pengujian kemudian dilaksanakan pada dua laptop fisik: ASUS Vivobook dan Lenovo IdeaPad 82KC. Keduanya berhasil boot dari flashdisk; koneksi internet, desktop, dan aplikasi berfungsi. Perbaikan B01 (tap-to-click) dan B03 (DPI) juga terverifikasi di Lenovo 82KC.
 
 ## 4.7 Pembahasan
 
@@ -354,10 +388,12 @@ Beberapa keterbatasan masih ada, antara lain sistem live tidak persisten, tidak 
 
 Berdasarkan hasil perancangan, implementasi, dan pengujian, kesimpulan proyek ini adalah sebagai berikut:
 
-1. Proses remastering Debian 13 berhasil dilakukan dengan live-build melalui serangkaian berkas konfigurasi paket, hook, dan aset. Hasilnya adalah ISO `spideros-v1.iso` yang dapat langsung boot ke desktop.
+1. Proses remastering Debian 13 berhasil dilakukan dengan live-build melalui serangkaian berkas konfigurasi paket, hook, dan aset. Hasilnya adalah ISO `spideros-v2.iso` yang dapat langsung boot ke desktop; build dapat diulang dari repositori, baik di VM maupun melalui GitHub Actions.
 2. VMware Workstation berfungsi sebagai lingkungan pengembangan sekaligus pengujian. VM digunakan untuk menjalankan build, sedangkan TEST-VM dipakai untuk memverifikasi hasil boot dan aplikasi.
 3. Fitur dan elemen tampilan yang dihasilkan meliputi wallpaper, login, Plymouth, terminal, prompt, dan ikon dengan palet Spider-Sense, serta aplikasi pendukung berupa browser, media player, pembaca komik, game, dan Spider-Sense.
-4. Flashdisk hasil remastering dapat langsung terbaca saat booting karena ISO bersifat hybrid dan memuat ISOLINUX untuk BIOS serta GRUB untuk UEFI. Prosedur pembuatan media boot sudah didokumentasikan, meskipun uji pada perangkat fisik masih menjadi pekerjaan lanjutan.
+4. Flashdisk hasil remastering dapat langsung terbaca saat booting karena ISO bersifat hybrid dan memuat ISOLINUX untuk BIOS serta GRUB untuk UEFI. Prosedur pembuatan media boot sudah didokumentasikan dan berhasil diuji pada dua laptop fisik (ASUS Vivobook dan Lenovo IdeaPad 82KC).
+
+Target pengguna penggemar Spider-Man / pengguna muda diwujudkan lewat identitas visual, aplikasi hiburan, auto-login, dan pemisahan akun `spider`/`admin` sebagai pengaman. Firewall `ufw` aktif melengkapi kebijakan keamanan.
 
 Sebagai kontribusi pemrograman, Spider-Sense berhasil dibangun dengan Rust std-only, membaca `/proc` secara manual, menghasilkan 15 test yang lulus, dan dikompilasi di dalam chroot saat build ISO.
 
@@ -368,7 +404,7 @@ Beberapa saran untuk pengembangan selanjutnya:
 1. Menambahkan installer seperti Calamares agar pengguna dapat memasang SpiderOS secara permanen.
 2. Menyediakan dukungan Secure Boot melalui bootloader bertanda tangan.
 3. Menambahkan opsi persistensi agar perubahan pengguna dapat disimpan.
-4. Melengkapi uji booting pada minimal dua perangkat fisik, baik mode UEFI maupun Legacy.
+4. Menambah uji booting pada perangkat fisik lain untuk memperluas cakupan kompatibilitas UEFI dan Legacy di luar ASUS Vivobook dan Lenovo IdeaPad 82KC.
 5. Mengumpulkan data performa kuantitatif seperti waktu boot, RAM idle, dan jumlah proses.
 6. Menambahkan lokalisasi bahasa Indonesia, tema tambahan, dan aplikasi Welcome untuk pengguna baru.
 
@@ -383,6 +419,10 @@ Bretthauer, D. (2001). Open source software: A history. OpenCommons, University 
 Chroboczek, J., & Lebresne, S. (2012). Juppix: A Linux Live-CD for undergraduate students. arXiv:1205.2748. https://arxiv.org/abs/1205.2748
 
 Debian Live Team. (n.d.). *Debian live manual*. https://live-team.pages.debian.net/live-manual/
+
+Debian Live Team. (2025). *lb_config(1), lb_build(1), live-build(7): halaman manual paket live-build untuk Debian trixie*. https://manpages.debian.org/trixie/live-build/lb_config.1.en.html
+
+Debian Live Team. (2025). *Sumber paket live-build 1:20250505+deb13u1 — functions/compatibility.sh dan scripts/build/chroot_includes_after_packages*. https://sources.debian.org/src/live-build/1%3A20250505%2Bdeb13u1/
 
 Fox, R. (2014). *Linux with operating system concepts*. Chapman and Hall/CRC. https://doi.org/10.1201/b17269
 
@@ -414,10 +454,11 @@ Tan, X., Zhou, M., & Fitzgerald, B. (2020). Scaling open source communities: An 
 
 | Item | Nilai |
 | --- | --- |
-| Nama berkas | `spideros-v1.iso` |
-| Ukuran | 1.930.952.704 byte |
-| SHA-256 | `8eac0f45a948f01c671dbac81e5654153ed3c4d58c28173cc74df9a4965a74ca` |
+| Nama berkas | `spideros-v2.iso` |
+| Ukuran | 1.936.654.336 byte |
+| SHA-256 | `9ba567cc4a240a90e28444b8bcc81691d1735190c3aed0456566b607c556199d` |
 | Hasil build | `P: Build completed successfully` |
+| Catatan | Checksum akan berubah lagi setelah build Phase 13 (akun `spider`/`admin`) |
 
 ## Lampiran B — Bukti visual
 
@@ -429,9 +470,11 @@ Tan, X., Zhou, M., & Fitzgerald, B. (2020). Scaling open source communities: An 
 
 ## Lampiran C — Panduan singkat penggunaan
 
-1. Buat flashdisk dari `spideros-v1.iso` dengan Rufus atau Balena Etcher.
-2. Matikan Secure Boot bila diperlukan, lalu boot dari flashdisk.
-3. Sistem masuk otomatis sebagai user `spider` dengan kata sandi `live`.
-4. Jalankan `neofetch` untuk tampilan statis atau `spider-sense` untuk mode live.
-5. Tambahkan komik ke `/usr/share/spideros/comics/` lalu buka SpiderOS Comics.
-6. Panduan lengkap tersedia di `docs/panduan_pengguna.md`, sedangkan catatan rilis di `docs/release_notes.md`.
+1. Buat flashdisk dari ISO terbaru di `dist/` (saat ini `spideros-v2.iso`) dengan Rufus, mode ISO image atau DD.
+2. Matikan Secure Boot bila diperlukan, lalu boot dari flashdisk. Di Lenovo, gunakan tombol **Novo → Boot Menu**.
+3. Sistem masuk otomatis sebagai `spider` (kata sandi `live` bila diminta). Akun ini **tanpa sudo**.
+4. Untuk memasang paket atau perawatan, login sebagai `admin` / `admin123` (atau `su - admin` dari sesi `spider`).
+5. Jalankan `neofetch` untuk tampilan statis atau `spider-sense` untuk mode live.
+6. Tambahkan komik ke `/usr/share/spideros/comics/` lalu buka SpiderOS Comics.
+7. Cek keamanan dengan `sudo ufw status` dari akun `admin`.
+8. Panduan lengkap tersedia di `docs/panduan_pengguna.md`, sedangkan catatan rilis di `docs/release_notes.md`.

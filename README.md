@@ -83,6 +83,17 @@ spider-sense --version   # spider-sense 1.0.0 (Rust, std-only)
 
 Komik ditempatkan sendiri oleh pengguna di `/usr/share/spideros/comics/`, lalu dibuka lewat aplikasi "SpiderOS Comics".
 
+## Target pengguna dan akun
+
+SpiderOS ditujukan untuk **penggemar Spider-Man / pengguna muda**: distro live yang menarik secara visual, ringan, dan langsung pakai.
+
+| Akun | Kata sandi | Hak |
+|---|---|---|
+| `spider` | `live` | User harian, auto-login, tanpa sudo |
+| `admin` | `admin123` | Administrator, punya sudo (grup `sudo` + grup perangkat) |
+
+Pemisahan akun dipakai sebagai pengaman: `spider` tidak bisa menjalankan `sudo`, `admin` satu-satunya yang bisa memasang paket atau mengubah sistem. Firewall `ufw` aktif menyaring koneksi masuk.
+
 ## Dokumentasi
 
 - [`docs/index.md`](docs/index.md) — peta seluruh dokumentasi

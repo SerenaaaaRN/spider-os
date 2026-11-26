@@ -21,6 +21,26 @@
 
 Alasan palet hangat: Spider-Sense sudah memakai keluarga warna 256-color hangat (maroon, rose, cream, sand, dusk). Supaya wallpaper, tema GTK, boot menu, Plymouth, prompt, dan terminal terasa satu identitas dengan komponen koding inti, seluruh aset visual mengikuti palet yang sama.
 
+## 1.1 Target pengguna dan persona
+
+| Persona | Karakteristik | Kebutuhan |
+|---|---|---|
+| **Utama — penggemar Spider-Man / pengguna muda** | Mengenal karakter Spider-Man, memakai laptop pribadi, ingin distro yang enak dilihat dan langsung dipakai | Identitas visual kuat, wallpaper/ikon bertema, hiburan ringan (komik, musik, video, game) |
+| Sekunder — pengguna yang tertarik sistem operasi | Ingin melihat cara kerja kernel lewat aplikasi nyata | Spider-Sense yang membaca `/proc` langsung sebagai "indra" bertema |
+
+Bukan target: kebutuhan server/enterprise dan instalasi permanen (SpiderOS memang distribusi live).
+
+Pemetaan kebutuhan ke keputusan desain:
+
+| Kebutuhan | Keputusan di SpiderOS |
+|---|---|
+| Identitas tema yang kuat | Palet merah-hitam, wallpaper & logo Spiderman, Plymouth `spiderman` |
+| Tampilan modern & nyaman | Papirus-Dark, Noto Sans / Fira Code, DPI 120 untuk laptop HiDPI |
+| Hiburan & komik | `mcomix`, `mpv`, `audacious`, game ringan, folder komik pengguna |
+| Kesan "Spider-Sense" nyata | Aplikasi Rust `spider-sense` / `neofetch` yang membaca `/proc` |
+| Pakai laptop sehari-hari | Tap-to-click, firmware WiFi/audio/BT, Network Manager |
+| Aman untuk pengguna awam | `ufw` aktif; dua akun dengan hak berbeda (`spider` vs `admin`) |
+
 ---
 
 ## 2. Palet warna (kanonik)

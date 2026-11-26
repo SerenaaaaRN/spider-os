@@ -2156,9 +2156,10 @@ Targetkan minimal 2 perangkat berbeda.
 
 | Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Spider-Sense | Catatan |
 |---|---|---|---|---|---|---|---|---|---|
-| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; lanjut uji fungsi lain |
+| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; di sini B01/B03 ditemukan |
+| Lenovo IdeaPad 82KC | UEFI | aktif | lewat tombol **Novo → Boot Menu** | ya | ya | belum diuji | tap jalan (B01 selesai) | ya | internet & `apt install` berhasil; UI normal (B03 selesai); Bluetooth belum diverifikasi |
 
-Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1 dan sudah diperbaiki di repo (menunggu rebuild).
+Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1. Perbaikannya sudah diverifikasi di Lenovo IdeaPad 82KC; pengujian ulang di ASUS Vivobook menyusul setelah rebuild v3. Bug **B03** (UI mungil) juga terverifikasi di perangkat yang sama.
 
 ### 11.9 Catat boot sequence (untuk BAB IV 4.3.2)
 
@@ -2206,8 +2207,8 @@ Cek mode boot yang dipakai:
 ### 11.11 Checklist Phase 11
 
 - [x] Checksum cocok, USB berhasil dibuat
-- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat (baru 1 perangkat: ASUS Vivobook)
-- [ ] Boot menu per merek, matriks hasil uji, dan bukti boot sequence terisi
+- [x] Boot sukses di 2 perangkat (ASUS Vivobook + Lenovo IdeaPad 82KC); mode UEFI tercatat di Lenovo, Legacy belum diuji
+- [x] Boot menu per merek dan matriks hasil uji terisi (ASUS & Lenovo); bukti boot sequence masih dari Phase 10
 - [x] Bug temuan masuk `docs/catatan.md` §12.1
 
 ✅ **Selesai kalau:** ISO terbukti boot dari flashdisk di perangkat asli (rumusan masalah ke-4 terjawab).
@@ -2242,7 +2243,7 @@ Urutkan prioritas: (1) tidak bisa boot, (2) tidak bisa dipakai, (3) tampilan, (4
 
 ### 12.2.1 Perbaikan yang sudah disiapkan (2026-11-26)
 
-Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perubahan yang menunggu rebuild:
+Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perubahan yang sudah disiapkan dan **menunggu rebuild lokal v3**:
 
 | Bug | File perbaikan | Isi |
 |---|---|---|
@@ -2250,8 +2251,10 @@ Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perub
 | B01 (fallback) | `config/includes.chroot_after_packages/usr/local/bin/spideros-touchpad-tap` + `etc/xdg/autostart/spideros-touchpad.desktop` | Aktifkan tapping via `xinput` saat sesi XFCE mulai |
 | B03 DPI terlalu kecil | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml` | `Xft/DPI = 120` (125%) untuk layar HiDPI |
 | Pencegahan bug hardware | `config/package-lists/hardware.list.chroot` | Firmware SOF/Intel audio, MediaTek, Cirrus, NVIDIA; `alsa-ucm-conf`; `bluez` + `pulseaudio-module-bluetooth`; `udisks2`, `exfatprogs`, `ntfs-3g`; `upower`, `thermald`, `brightnessctl`; VA-API; alat diagnostik |
+| Pemisahan akun (Phase 13) | `config/hooks-templates/0060-users.hook.chroot` + `etc/lightdm/lightdm.conf.d/50-spideros.conf` | `spider` harian tanpa sudo, `admin` dengan sudo, auto-login `spider` |
+| Ukuran jendela terminal | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/terminal/terminalrc` | `MiscDefaultGeometry=110x32` + `MiscInheritGeometry=FALSE`; font tetap `Fira Code 11` |
 
-Setelah build, uji ulang B01 dan fungsi hardware lain di ASUS Vivobook, lalu perbarui matriks 11.8.
+B01 dan B03 sudah terverifikasi di Lenovo IdeaPad 82KC. Setelah rebuild v3, uji ulang di ASUS Vivobook, verifikasi `sudo -l`/`ufw status`, lalu perbarui matriks 11.8 dan checksum.
 
 ### 12.3 Build v2
 
@@ -2287,10 +2290,11 @@ Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk la
 
 ### 12.6 Checklist Phase 12
 
-- [ ] Semua bug prioritas 1 dan 2 selesai
-- [ ] ISO final diuji ulang di VM dan perangkat asli
-- [ ] Tag `v1.0`, checksum, release notes ada
-- [ ] ISO dibackup, flashdisk presentasi siap
+- [x] Semua bug prioritas 1 dan 2 selesai (B01 & B03 terverifikasi di Lenovo IdeaPad 82KC)
+- [x] Kredensial dan hak akses `spider`/`admin` terdokumentasikan (lihat Phase 13)
+- [ ] ISO v3 diuji ulang di VM dan perangkat asli, termasuk `sudo -l` dan `ufw status`
+- [ ] Checksum v3, release notes, dan `docs/catatan.md` disamakan (B02)
+- [ ] Flashdisk presentasi siap dari ISO v3
 
 ✅ **Selesai kalau:** ISO final stabil dan dibekukan.
 
@@ -2389,7 +2393,7 @@ Rencana demo bertingkat:
 Checklist H-1:
 - [ ] Flashdisk bootable + 1 cadangan
 - [ ] ISO dan VM test ada di laptop presentasi
-- [ ] Tombol boot menu laptop yang dipakai sudah dicatat
+- [x] Tombol boot menu laptop yang dipakai sudah dicatat (ASUS: Esc/F2; Lenovo IdeaPad 82KC: Novo → Boot Menu)
 - [ ] Video demo siap
 - [ ] Slide: latar belakang, rumusan, alur live-build, tema, uji hardware, boot sequence, demo, kesimpulan
 - [ ] Pembagian bicara jelas, semua anggota paham alur teknis
@@ -2410,12 +2414,29 @@ Checklist H-1:
 | Di mana kode dikompilasi? | Di dalam chroot saat build ISO melalui hook `0400-spider-sense-build.hook.chroot`, bukan binary yang dibangun di host |
 | Dari mana isi komik dan game-nya? | ISO menyediakan aplikasinya saja (mcomix dari repo Debian); pengguna mengisi komiknya sendiri setelah install. Game dan aplikasi lain di-install dari repo resmi Debian — tidak ada aset berhak cipta pihak ketiga di ISO |
 
+### 13.6 Target pengguna, akun, dan pengamanan
+
+Target pengguna SpiderOS adalah **penggemar Spider-Man / pengguna muda**: pengguna laptop pribadi yang menginginkan distro live dengan identitas visual kuat, ringan, dan langsung pakai. Kebutuhan ini diterjemahkan menjadi wallpaper/ikon bertema, Plymouth, aplikasi hiburan (komik, musik, video, game), DPI 120, dan auto-login.
+
+Pemisahan akun dipakai sebagai pengamanan:
+
+| Akun | Kata sandi | Grup utama | Hak akses |
+|---|---|---|---|
+| `spider` | `live` | grup perangkat dari `live-config` | User harian, auto-login, **tanpa sudo** |
+| `admin` | `admin123` | `sudo`, `audio`, `video`, `plugdev`, `bluetooth` | Administrator, satu-satunya yang bisa `sudo` |
+
+Hook `0060-users.hook.chroot` membuat `admin`, menyalin `/etc/skel`, mengunci root, dan memasang `/etc/sudoers.d/99-spideros-no-sudo` (mode `440`) yang melarang `spider` memakai `sudo`. LightDM dikonfigurasi lewat `lightdm.conf.d/50-spideros.conf` agar auto-login sebagai `spider`. Home tiap akun berizin `700`. Firewall `ufw` aktif dengan kebijakan tolak koneksi masuk dan izinkan koneksi keluar.
+
+Verifikasi di ISO hasil build v3: `id spider`, `id admin`, `sudo -l -U spider` (harus ditolak), `sudo -l -U admin` (diizinkan), `sudo ufw status` (aktif).
+
 ### 13.7 Checklist Phase 13
 
 - [ ] BAB III sampai V lengkap dan konsisten dengan ISO final
-- [ ] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
-- [ ] Panduan pengguna, video demo, release notes siap
+- [x] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
+- [ ] Panduan pengguna dan release notes siap; video demo masih tertunda
 - [ ] Latihan presentasi selesai, rencana A, B, C siap
+- [x] Target pengguna, akun `spider`/`admin`, kata sandi, dan hak akses terdokumentasi
+- [ ] Pemisahan hak (`sudo -l`) dan `ufw status` diverifikasi di ISO hasil build
 
 ✅ **Selesai kalau:** laporan final, demo, dan materi presentasi siap dikumpulkan.
 

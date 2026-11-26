@@ -1,0 +1,46 @@
+#!/bin/bash
+# Pemisahan pengguna SpiderOS (target: penggemar Spider-Man / pengguna muda).
+#
+#   spider -> akun harian, auto-login, TANPA hak sudo.
+#   admin  -> akun administrasi, satu-satunya yang punya sudo.
+#
+# Dijalankan setelah includes.chroot_after_packages disalin, sehingga
+# /etc/skel sudah berisi konfigurasi DPI 120 dan tema.
+
+set -e
+
+# --- Akun administrasi ---
+if ! id admin >/dev/null 2>&1; then
+    useradd -m -s /bin/bash admin
+fi
+
+# Grup perangkat: hanya tambahkan kalau grupnya memang ada di trixie.
+for g in sudo audio video plugdev bluetooth dialout cdrom users; do
+    if getent group "$g" >/dev/null 2>&1; then
+        usermod -aG "$g" admin
+    fi
+done
+
+# Kata sandi admin (terdocumentasi di docs/ dan release notes).
+echo 'admin:admin123' | chpasswd
+chage -E -1 -M -1 admin 2>/dev/null || true
+
+# Samakan isi home dengan /etc/skel (DPI 120, xfconf, dll.).
+cp -a /etc/skel/. /home/admin/ 2>/dev/null || true
+chown -R admin:admin /home/admin
+chmod 700 /home/admin
+
+# --- Akun harian spider dibuat live-config saat boot ---
+# live-config memasukkan spider ke grup sudo secara default. Aturan di bawah
+# menimpa itu: spider tidak boleh menjalankan perintah apa pun lewat sudo.
+# Letak di /etc/sudoers.d/ dibaca setelah /etc/sudoers, jadi aturan ini menang.
+cat > /etc/sudoers.d/99-spideros-no-sudo <<'EOF'
+# SpiderOS: hak administrasi hanya untuk akun admin.
+spider ALL=(ALL:ALL) !ALL
+EOF
+chmod 0440 /etc/sudoers.d/99-spideros-no-sudo
+
+# --- Root tidak boleh dipakai langsung ---
+passwd -l root >/dev/null 2>&1 || true
+
+echo "OK: admin dibuat dengan sudo; spider hanya user harian (tanpa sudo)."

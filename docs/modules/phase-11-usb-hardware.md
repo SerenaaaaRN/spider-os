@@ -92,9 +92,10 @@ Targetkan minimal 2 perangkat berbeda.
 
 | Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Spider-Sense | Catatan |
 |---|---|---|---|---|---|---|---|---|---|
-| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; lanjut uji fungsi lain |
+| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; di sini B01/B03 ditemukan |
+| Lenovo IdeaPad 82KC | UEFI | aktif | lewat tombol **Novo → Boot Menu** | ya | ya | belum diuji | tap jalan (B01 selesai) | ya | internet & `apt install` berhasil; UI normal (B03 selesai); Bluetooth belum diverifikasi |
 
-Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1 dan sudah diperbaiki di repo (menunggu rebuild).
+Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1. Perbaikannya sudah diverifikasi di Lenovo IdeaPad 82KC; pengujian ulang di ASUS Vivobook menyusul setelah rebuild v3. Bug **B03** (UI mungil) juga terverifikasi di perangkat yang sama.
 
 ### 11.9 Catat boot sequence (untuk BAB IV 4.3.2)
 
@@ -142,8 +143,8 @@ Cek mode boot yang dipakai:
 ### 11.11 Checklist Phase 11
 
 - [x] Checksum cocok, USB berhasil dibuat
-- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat (baru 1 perangkat: ASUS Vivobook)
-- [ ] Boot menu per merek, matriks hasil uji, dan bukti boot sequence terisi
+- [x] Boot sukses di 2 perangkat (ASUS Vivobook + Lenovo IdeaPad 82KC); mode UEFI tercatat di Lenovo, Legacy belum diuji
+- [x] Boot menu per merek dan matriks hasil uji terisi (ASUS & Lenovo); bukti boot sequence masih dari Phase 10
 - [x] Bug temuan masuk `docs/catatan.md` §12.1
 
 ✅ **Selesai kalau:** ISO terbukti boot dari flashdisk di perangkat asli (rumusan masalah ke-4 terjawab).

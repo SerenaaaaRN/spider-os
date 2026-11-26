@@ -26,7 +26,7 @@ Urutkan prioritas: (1) tidak bisa boot, (2) tidak bisa dipakai, (3) tampilan, (4
 
 ### 12.2.1 Perbaikan yang sudah disiapkan (2026-11-26)
 
-Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perubahan yang menunggu rebuild:
+Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perubahan yang sudah disiapkan dan **menunggu rebuild lokal v3**:
 
 | Bug | File perbaikan | Isi |
 |---|---|---|
@@ -34,8 +34,10 @@ Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perub
 | B01 (fallback) | `config/includes.chroot_after_packages/usr/local/bin/spideros-touchpad-tap` + `etc/xdg/autostart/spideros-touchpad.desktop` | Aktifkan tapping via `xinput` saat sesi XFCE mulai |
 | B03 DPI terlalu kecil | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml` | `Xft/DPI = 120` (125%) untuk layar HiDPI |
 | Pencegahan bug hardware | `config/package-lists/hardware.list.chroot` | Firmware SOF/Intel audio, MediaTek, Cirrus, NVIDIA; `alsa-ucm-conf`; `bluez` + `pulseaudio-module-bluetooth`; `udisks2`, `exfatprogs`, `ntfs-3g`; `upower`, `thermald`, `brightnessctl`; VA-API; alat diagnostik |
+| Pemisahan akun (Phase 13) | `config/hooks-templates/0060-users.hook.chroot` + `etc/lightdm/lightdm.conf.d/50-spideros.conf` | `spider` harian tanpa sudo, `admin` dengan sudo, auto-login `spider` |
+| Ukuran jendela terminal | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/terminal/terminalrc` | `MiscDefaultGeometry=110x32` + `MiscInheritGeometry=FALSE`; font tetap `Fira Code 11` |
 
-Setelah build, uji ulang B01 dan fungsi hardware lain di ASUS Vivobook, lalu perbarui matriks 11.8.
+B01 dan B03 sudah terverifikasi di Lenovo IdeaPad 82KC. Setelah rebuild v3, uji ulang di ASUS Vivobook, verifikasi `sudo -l`/`ufw status`, lalu perbarui matriks 11.8 dan checksum.
 
 ### 12.3 Build v2
 
@@ -71,10 +73,11 @@ Cadangan ISO final di minimal dua tempat (misalnya laptop dan cloud/flashdisk la
 
 ### 12.6 Checklist Phase 12
 
-- [ ] Semua bug prioritas 1 dan 2 selesai
-- [ ] ISO final diuji ulang di VM dan perangkat asli
-- [ ] Tag `v1.0`, checksum, release notes ada
-- [ ] ISO dibackup, flashdisk presentasi siap
+- [x] Semua bug prioritas 1 dan 2 selesai (B01 & B03 terverifikasi di Lenovo IdeaPad 82KC)
+- [x] Kredensial dan hak akses `spider`/`admin` terdokumentasikan (lihat Phase 13)
+- [ ] ISO v3 diuji ulang di VM dan perangkat asli, termasuk `sudo -l` dan `ufw status`
+- [ ] Checksum v3, release notes, dan `docs/catatan.md` disamakan (B02)
+- [ ] Flashdisk presentasi siap dari ISO v3
 
 ✅ **Selesai kalau:** ISO final stabil dan dibekukan.
 

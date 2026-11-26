@@ -11,7 +11,7 @@ Tujuannya:
 - **Spider-Sense**, tool Rust std-only yang membaca `/proc`, mem-parsing data kernel secara manual, dan merender antarmuka ANSI real-time — komponen koding inti proyek.
 - Dokumentasi yang langsung dipakai sebagai bahan BAB III, IV, dan V laporan.
 
-Build dilakukan di VM Debian 13 (`[BUILD-VM]`), uji boot di VM test (`[TEST-VM]`), sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. ISO final `spideros-v1.iso` sudah jadi. Phase 1–10 selesai; berikutnya freeze dan laporan.
+Build dilakukan di VM Debian 13 (`[BUILD-VM]`) atau melalui GitHub Actions (`.github/workflows/build-iso.yml`, dipicu manual atau tag `v*`/`ci-*`), uji boot di VM test (`[TEST-VM]`) dan pada laptop fisik, sedangkan transfer ISO dan flashing USB dilakukan dari Windows (`[HOST]`). Folder kerja: `~/spideros`. ISO terbaru yang terverifikasi adalah `spideros-v2.iso` (`9ba567…199d`). Phase 1–11 selesai; Phase 12–13 berjalan menuju build final.
 
 Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modul_guide.md` berisi versi gabungan, dipakai bila seluruh modul dibutuhkan dalam satu file.
 
@@ -32,9 +32,9 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 9.5 — Kolektor komik (mcomix) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ✅ Selesai |
 | Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ✅ Selesai |
 | Phase 10 — ISO v1 dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ✅ Selesai |
-| Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | 🟡 Sebagian (boot ASUS Vivobook OK; uji perangkat kedua menyusul) |
-| Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | 🟡 Berjalan (fix touchpad + paket hardware siap, menunggu rebuild) |
-| Phase 13 — Laporan, panduan, demo | [`modules/phase-13-laporan.md`](modules/phase-13-laporan.md) | ⬜ Belum |
+| Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | ✅ Selesai (2 perangkat: ASUS Vivobook + Lenovo IdeaPad 82KC; Bluetooth belum diverifikasi) |
+| Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | 🟡 Siap — menunggu rebuild lokal v3 (touchpad, DPI, paket hardware, akun) |
+| Phase 13 — Laporan, panduan, demo | [`modules/phase-13-laporan.md`](modules/phase-13-laporan.md) | 🟡 Berjalan — dokumentasi selesai; demo/presentasi dan verifikasi ISO final tertunda |
 | Lampiran A, B, D, E, F | [`modules/lampiran-01-referensi.md`](modules/lampiran-01-referensi.md) | — |
 | Lampiran C — Struktur akhir repo | [`modules/lampiran-02-struktur-repo.md`](modules/lampiran-02-struktur-repo.md) | — |
 | Lampiran G, H — VirtualBox dan VMware | [`modules/lampiran-03-hypervisor.md`](modules/lampiran-03-hypervisor.md) | — |
@@ -48,7 +48,7 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 - Baca indeks ini dulu, lalu buka hanya file phase yang sedang dikerjakan.
 - `modules/modul_guide.md` adalah versi gabungan dari semua file di atas. Dihasilkan oleh `scripts/generate-modul.py`; tidak diedit langsung.
 - Setelah mengubah file phase, jalankan `python scripts/generate-modul.py` untuk memperbarui versi gabungan.
-- Strategi build: **satu build final `v1.0-rc1` di Phase 10**. Phase 5–9 hanya menyiapkan dan memvalidasi konfigurasi, tanpa build per phase.
+- Strategi build: **satu build per tonggak** — `v1.0-rc1` (Phase 10), `v2` (Phase 12), dan `v3` (Phase 13) menunggu build lokal. Phase 5–9 hanya menyiapkan dan memvalidasi konfigurasi, tanpa build per phase.
 
 ## Alur sinkronisasi Windows ↔ VM
 

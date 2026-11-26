@@ -91,7 +91,7 @@ Rencana demo bertingkat:
 Checklist H-1:
 - [ ] Flashdisk bootable + 1 cadangan
 - [ ] ISO dan VM test ada di laptop presentasi
-- [ ] Tombol boot menu laptop yang dipakai sudah dicatat
+- [x] Tombol boot menu laptop yang dipakai sudah dicatat (ASUS: Esc/F2; Lenovo IdeaPad 82KC: Novo → Boot Menu)
 - [ ] Video demo siap
 - [ ] Slide: latar belakang, rumusan, alur live-build, tema, uji hardware, boot sequence, demo, kesimpulan
 - [ ] Pembagian bicara jelas, semua anggota paham alur teknis
@@ -112,12 +112,29 @@ Checklist H-1:
 | Di mana kode dikompilasi? | Di dalam chroot saat build ISO melalui hook `0400-spider-sense-build.hook.chroot`, bukan binary yang dibangun di host |
 | Dari mana isi komik dan game-nya? | ISO menyediakan aplikasinya saja (mcomix dari repo Debian); pengguna mengisi komiknya sendiri setelah install. Game dan aplikasi lain di-install dari repo resmi Debian — tidak ada aset berhak cipta pihak ketiga di ISO |
 
+### 13.6 Target pengguna, akun, dan pengamanan
+
+Target pengguna SpiderOS adalah **penggemar Spider-Man / pengguna muda**: pengguna laptop pribadi yang menginginkan distro live dengan identitas visual kuat, ringan, dan langsung pakai. Kebutuhan ini diterjemahkan menjadi wallpaper/ikon bertema, Plymouth, aplikasi hiburan (komik, musik, video, game), DPI 120, dan auto-login.
+
+Pemisahan akun dipakai sebagai pengamanan:
+
+| Akun | Kata sandi | Grup utama | Hak akses |
+|---|---|---|---|
+| `spider` | `live` | grup perangkat dari `live-config` | User harian, auto-login, **tanpa sudo** |
+| `admin` | `admin123` | `sudo`, `audio`, `video`, `plugdev`, `bluetooth` | Administrator, satu-satunya yang bisa `sudo` |
+
+Hook `0060-users.hook.chroot` membuat `admin`, menyalin `/etc/skel`, mengunci root, dan memasang `/etc/sudoers.d/99-spideros-no-sudo` (mode `440`) yang melarang `spider` memakai `sudo`. LightDM dikonfigurasi lewat `lightdm.conf.d/50-spideros.conf` agar auto-login sebagai `spider`. Home tiap akun berizin `700`. Firewall `ufw` aktif dengan kebijakan tolak koneksi masuk dan izinkan koneksi keluar.
+
+Verifikasi di ISO hasil build v3: `id spider`, `id admin`, `sudo -l -U spider` (harus ditolak), `sudo -l -U admin` (diizinkan), `sudo ufw status` (aktif).
+
 ### 13.7 Checklist Phase 13
 
 - [ ] BAB III sampai V lengkap dan konsisten dengan ISO final
-- [ ] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
-- [ ] Panduan pengguna, video demo, release notes siap
+- [x] Source Rust, hook `0400`, hasil `cargo test`, dan verifikasi binary terdokumentasi
+- [ ] Panduan pengguna dan release notes siap; video demo masih tertunda
 - [ ] Latihan presentasi selesai, rencana A, B, C siap
+- [x] Target pengguna, akun `spider`/`admin`, kata sandi, dan hak akses terdokumentasi
+- [ ] Pemisahan hak (`sudo -l`) dan `ufw status` diverifikasi di ISO hasil build
 
 ✅ **Selesai kalau:** laporan final, demo, dan materi presentasi siap dikumpulkan.
 

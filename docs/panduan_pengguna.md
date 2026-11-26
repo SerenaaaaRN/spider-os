@@ -46,9 +46,24 @@ Semua isi flashdisk akan terhapus. Backup data penting lebih dulu.
 
 Kalau flashdisk tidak muncul, matikan Secure Boot di BIOS (Security atau Boot → Secure Boot → Disabled). Aktifkan kembali setelah selesai. Nonaktifkan juga Fast Startup Windows atau pakai **Restart**, bukan Shut down.
 
-## 4. Login
+## 4. Akun dan login
 
-Sistem masuk otomatis sebagai user `spider`. Bila diminta kata sandi, gunakan `live`.
+SpiderOS memakai **dua akun** supaya pemakaian harian tidak bisa mengubah sistem secara tidak sengaja.
+
+| Akun | Kata sandi | Hak | Dipakai untuk |
+|---|---|---|---|
+| `spider` | `live` | User biasa, **tanpa sudo** | Pemakaian harian; masuk otomatis saat boot |
+| `admin` | `admin123` | Anggota `sudo` + grup perangkat | Install paket, ubah konfigurasi sistem, perawatan |
+
+Sistem masuk otomatis sebagai `spider`. Kalau layar login tetap muncul, pilih `spider` dengan kata sandi `live`. Untuk pekerjaan administrasi, logout lalu login sebagai `admin`, atau dari sesi `spider` jalankan `su - admin` dan masukkan kata sandi admin.
+
+```bash
+su - admin
+sudo apt install fastfetch
+sudo ufw status
+```
+
+Root tidak bisa dipakai untuk login langsung.
 
 ## 5. Tur fitur
 
