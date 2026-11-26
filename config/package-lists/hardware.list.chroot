@@ -1,0 +1,46 @@
+# --- Firmware laptop modern (audio DSP, Intel GPU, MediaTek WiFi/BT) ---
+firmware-sof-signed
+firmware-intel-sound
+firmware-intel-graphics
+firmware-intel-misc
+firmware-cirrus
+firmware-mediatek
+firmware-nvidia-graphics
+
+# --- Audio ---
+alsa-ucm-conf
+alsa-utils
+
+# --- Input / touchpad ---
+xserver-xorg-input-libinput
+libinput-tools
+xinput
+
+# --- Jaringan dan Bluetooth ---
+wpasupplicant
+wireless-regdb
+bluez
+bluetooth
+blueman
+rfkill
+iw
+
+# --- Storage dan filesystem ---
+udisks2
+exfatprogs
+ntfs-3g
+dosfstools
+
+# --- Power dan laptop ---
+upower
+thermald
+brightnessctl
+
+# --- Video acceleration ---
+mesa-va-drivers
+intel-media-va-driver-non-free
+i965-va-driver
+
+# --- Diagnostik hardware ---
+pciutils
+usbutils

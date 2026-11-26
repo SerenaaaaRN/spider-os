@@ -113,7 +113,7 @@ Catat semua angka. Sebagai pembanding, data RAM idle Debian XFCE default atau Ub
 
 ### 10.5 Hentikan penambahan fitur
 
-Setelah rc1 jadi, daftar bug masuk ke `docs/bug-log.md` (format di Phase 12). Fitur baru tidak boleh ditambah, kecuali perbaikan bug.
+Setelah rc1 jadi, daftar bug masuk ke `docs/catatan.md` §12.1 (format di Phase 12). Fitur baru tidak boleh ditambah, kecuali perbaikan bug.
 
 ### 10.6 Commit, tag, snapshot
 

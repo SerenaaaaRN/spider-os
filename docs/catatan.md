@@ -27,6 +27,8 @@ Format tiap entri: tanggal, phase, apa yang dilakukan, command, hasil.
 | 2026-11-24 | Phase 10 | Finalisasi artefak: rename ISO jadi `spideros-v1.iso`, buat ulang checksum, bersihkan file lama | `mv`, `sha256sum -c`, `Dismount-DiskImage` | `spideros-v1.iso` 1,8 G; checksum `559c65…2504` COCOK; ISO lama yang ter-mount sebagai drive E: sudah dilepas dan dihapus |
 | 2026-11-24 | Dokumentasi | Catat hasil uji Phase 10 ke tabel di bawah; perbedaan BIOS/UEFI tidak dijadikan kriteria (auto-boot by design) | edit `docs/catatan.md`, `docs/index.md` | Phase 1–10 ditandai selesai; item yang belum sempat diuji ditandai jujur |
 | 2026-11-24 | Phase 9.5/9.6 | Audit akhir: ternyata Phase 9.5/9.6 hanya ada di doc. Buat package list `content.list.chroot` + `games.list.chroot`, 3 desktop entry, folder komik + README | `write` file baru di `config/` | File siap; perlu rebuild sekali lagi supaya masuk ISO |
+| 2026-11-26 | Phase 11 | Verifikasi ISO, flash USB 8 GB (SanDisk Cruzer Blade) dengan Rufus 4.16 mode DD, lalu uji boot di laptop ASUS Vivobook | `Get-FileHash` (8eac0f45…5a74ca cocok), Rufus START → DD Image mode, boot menu → Live system | Boot live system **berhasil**. Bug: tap-to-click touchpad mati, harus klik fisik (dicatat B01) |
+| 2026-11-26 | Phase 12 | Siapkan perbaikan bug B01 + pencegahan bug hardware lain: konfigurasi libinput tap-to-click + autostart, package list hardware (firmware SOF/Intel audio, MediaTek, Bluetooth, storage, power, VA-API) | `write` file baru di `config/`; tabel bug masuk `docs/catatan.md` §12.1; edit `docs/index.md`, `docs/modules/phase-11-usb-hardware.md` | File siap; **belum di-build**. Langkah berikutnya: rebuild `./scripts/build.sh v1.0` di VM lalu uji ulang di ASUS |
 
 ### 10.2 Hasil uji Phase 10
 
@@ -57,3 +59,18 @@ BIOS dan UEFI tidak dibedakan: `live-build` menyembunyikan menu boot dan langsun
 | 21 | `mpv` dan `audacious` terbuka | Lulus | Keduanya jalan dari menu |
 
 Bukti: `P10-boot-bios-1.png` (Plymouth), `P10-boot-bios-2.png` (desktop + terminal + frame Spider-Sense). Data performa belum dikumpulkan.
+
+### 12.1 Bug log (Phase 11–12)
+
+Ditemukan bug selama Phase 10–12. Urutan prioritas: (1) tidak bisa boot, (2) tidak bisa dipakai, (3) tampilan, (4) kosmetik.
+
+| ID | Ditemukan di | Deskripsi | Penyebab | Perbaikan | Status |
+|---|---|---|---|---|---|
+| B01 | Phase 11 — ASUS Vivobook | Tap-to-click touchpad tidak berfungsi; harus menekan tombol fisik di bawah touchpad | libinput default `Tapping=0` di Debian/XFCE | `config/includes.chroot_after_packages/etc/X11/xorg.conf.d/40-libinput-touchpad.conf` + autostart `spideros-touchpad-tap` | Diperbaiki, menunggu uji ISO baru |
+| B02 | Phase 12 — dokumentasi | Checksum di `docs/catatan.md` (`559c65…2504`) tidak cocok dengan ISO final di `dist/` (`8eac0f45…5a74ca`) | ISO dibangun ulang setelah entri catatan lama dibuat | Samakan checksum di catatan/release notes setelah build final | Terbuka |
+
+Catatan:
+
+- B01 adalah bug fungsional prioritas 2 (perangkat tidak nyaman dipakai).
+- Setelah rebuild Phase 12, uji ulang B01 di ASUS Vivobook dan perangkat kedua.
+- Bug baru ditambahkan di tabel ini sebelum rebuild berikutnya.

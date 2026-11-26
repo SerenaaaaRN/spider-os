@@ -2037,7 +2037,7 @@ Catat semua angka. Sebagai pembanding, data RAM idle Debian XFCE default atau Ub
 
 ### 10.5 Hentikan penambahan fitur
 
-Setelah rc1 jadi, daftar bug masuk ke `docs/bug-log.md` (format di Phase 12). Fitur baru tidak boleh ditambah, kecuali perbaikan bug.
+Setelah rc1 jadi, daftar bug masuk ke `docs/catatan.md` §12.1 (format di Phase 12). Fitur baru tidak boleh ditambah, kecuali perbaikan bug.
 
 ### 10.6 Commit, tag, snapshot
 
@@ -2152,6 +2152,14 @@ Isi untuk tiap perangkat yang diuji:
 
 Targetkan minimal 2 perangkat berbeda.
 
+**Hasil sejauh ini (2026-11-26):**
+
+| Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Spider-Sense | Catatan |
+|---|---|---|---|---|---|---|---|---|---|
+| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; lanjut uji fungsi lain |
+
+Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1 dan sudah diperbaiki di repo (menunggu rebuild).
+
 ### 11.9 Catat boot sequence (untuk BAB IV 4.3.2)
 
 Urutan proses yang terjadi saat boot dari flashdisk:
@@ -2197,10 +2205,10 @@ Cek mode boot yang dipakai:
 
 ### 11.11 Checklist Phase 11
 
-- [ ] Checksum cocok, USB berhasil dibuat
-- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat
+- [x] Checksum cocok, USB berhasil dibuat
+- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat (baru 1 perangkat: ASUS Vivobook)
 - [ ] Boot menu per merek, matriks hasil uji, dan bukti boot sequence terisi
-- [ ] Bug temuan masuk `docs/bug-log.md`
+- [x] Bug temuan masuk `docs/catatan.md` §12.1
 
 ✅ **Selesai kalau:** ISO terbukti boot dari flashdisk di perangkat asli (rumusan masalah ke-4 terjawab).
 
@@ -2213,7 +2221,7 @@ Cek mode boot yang dipakai:
 
 ### 12.1 Bug log
 
-Buat `docs/bug-log.md`:
+Catat bug di `docs/catatan.md` bagian **§12.1** (satu file dengan catatan progres, tidak ada file terpisah):
 
 | ID | Ditemukan di | Deskripsi | Penyebab | Perbaikan | Status |
 |---|---|---|---|---|---|
@@ -2231,6 +2239,18 @@ Urutkan prioritas: (1) tidak bisa boot, (2) tidak bisa dipakai, (3) tampilan, (4
 | Bahasa/keyboard | Ubah parameter `keyboard-layouts` dan `locales` |
 | ISO terlalu besar | Hapus paket berat (lihat 5.2), pastikan toolchain Rust sudah dipurge oleh hook 0400 |
 | Spider-Sense gagal dikompilasi di chroot | Cek `Cargo.lock`, paket build-only, dan log hook 0400; jalankan `cargo build --release --locked` manual di `tools/spider-sense` |
+
+### 12.2.1 Perbaikan yang sudah disiapkan (2026-11-26)
+
+Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perubahan yang menunggu rebuild:
+
+| Bug | File perbaikan | Isi |
+|---|---|---|
+| B01 tap-to-click mati | `config/includes.chroot_after_packages/etc/X11/xorg.conf.d/40-libinput-touchpad.conf` | `Option "Tapping" "on"` untuk semua touchpad libinput |
+| B01 (fallback) | `config/includes.chroot_after_packages/usr/local/bin/spideros-touchpad-tap` + `etc/xdg/autostart/spideros-touchpad.desktop` | Aktifkan tapping via `xinput` saat sesi XFCE mulai |
+| Pencegahan bug hardware | `config/package-lists/hardware.list.chroot` | Firmware SOF/Intel audio, MediaTek, Cirrus, NVIDIA; `alsa-ucm-conf`; `bluez`; `udisks2`, `exfatprogs`, `ntfs-3g`; `upower`, `thermald`, `brightnessctl`; VA-API; alat diagnostik |
+
+Setelah build, uji ulang B01 dan fungsi hardware lain di ASUS Vivobook, lalu perbarui matriks 11.8.
 
 ### 12.3 Build v2
 
@@ -2486,6 +2506,7 @@ spideros/
  │   │   ├── spideros.list.chroot
  │   │   ├── content.list.chroot                 # mcomix, mpv, audacious
  │   │   ├── games.list.chroot                   # bastet, nethack-console, gnome-mines, gnome-sudoku
+ │   │   ├── hardware.list.chroot                # firmware laptop, Bluetooth, storage, power, VA-API
  │   │   └── spider-sense-build.list.chroot      # cargo, rustc, build-essential (build-only)
  │   ├── hooks/live/
  │   │   ├── 0050-system-config.hook.chroot
@@ -2497,6 +2518,8 @@ spideros/
  │   └── includes.chroot_after_packages/
  │       ├── etc/
  │       │   ├── lightdm/lightdm-gtk-greeter.conf
+ │       │   ├── X11/xorg.conf.d/40-libinput-touchpad.conf   # tap-to-click (B01)
+ │       │   ├── xdg/autostart/spideros-touchpad.desktop     # fallback tap-to-click
  │       │   └── skel/
  │       │       ├── .bash_aliases
  │       │       └── .config/
@@ -2507,6 +2530,7 @@ spideros/
  │       ├── opt/spider-sense-src/           # staging generated (gitignored)
  │       └── usr/
  │           ├── local/bin/spideros-wallpaper        # skrip wallpaper
+ │           ├── local/bin/spideros-touchpad-tap     # fallback tap-to-click (B01)
  │           └── local/bin/neofetch                # symlink dibuat hook 0300 (tidak di repo)
  │           ├── share/applications/
  │           │   ├── spider-sense.desktop
@@ -2524,7 +2548,7 @@ spideros/
  │   └── stage-spider-sense.sh
  ├── dist/                                  # ISO hasil (tidak di-commit)
  └── docs/
-     ├── catatan.md, bug-log.md, desain.md
+     ├── catatan.md, desain.md
      ├── release_notes.md, panduan_pengguna.md, laporan.md
      └── screenshots/
 ```

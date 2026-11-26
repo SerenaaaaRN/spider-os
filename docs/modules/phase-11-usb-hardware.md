@@ -88,6 +88,14 @@ Isi untuk tiap perangkat yang diuji:
 
 Targetkan minimal 2 perangkat berbeda.
 
+**Hasil sejauh ini (2026-11-26):**
+
+| Perangkat (merek/model) | Mode boot | Secure Boot | Boot menu muncul | Desktop muncul | WiFi | Audio | Touchpad | Spider-Sense | Catatan |
+|---|---|---|---|---|---|---|---|---|---|
+| ASUS Vivobook | belum dicatat | Off | ya | ya (live system) | belum diuji | belum diuji | tap mati → B01 | belum diuji | boot berhasil; lanjut uji fungsi lain |
+
+Bug touchpad dicatat sebagai **B01** di [`docs/catatan.md`](../catatan.md) §12.1 dan sudah diperbaiki di repo (menunggu rebuild).
+
 ### 11.9 Catat boot sequence (untuk BAB IV 4.3.2)
 
 Urutan proses yang terjadi saat boot dari flashdisk:
@@ -133,10 +141,10 @@ Cek mode boot yang dipakai:
 
 ### 11.11 Checklist Phase 11
 
-- [ ] Checksum cocok, USB berhasil dibuat
-- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat
+- [x] Checksum cocok, USB berhasil dibuat
+- [ ] Boot sukses di minimal 2 perangkat, mode UEFI dan Legacy tercatat (baru 1 perangkat: ASUS Vivobook)
 - [ ] Boot menu per merek, matriks hasil uji, dan bukti boot sequence terisi
-- [ ] Bug temuan masuk `docs/bug-log.md`
+- [x] Bug temuan masuk `docs/catatan.md` §12.1
 
 ✅ **Selesai kalau:** ISO terbukti boot dari flashdisk di perangkat asli (rumusan masalah ke-4 terjawab).
 

@@ -32,8 +32,8 @@ Untuk pengerjaan, buka file phase yang relevan di `modules/`. File `modules/modu
 | Phase 9.5 — Kolektor komik (mcomix) | [`modules/phase-09.5-komik.md`](modules/phase-09.5-komik.md) | ✅ Selesai |
 | Phase 9.6 — Game offline dari repo Debian | [`modules/phase-09.6-game.md`](modules/phase-09.6-game.md) | ✅ Selesai |
 | Phase 10 — ISO v1 dan uji menyeluruh | [`modules/phase-10-rc1.md`](modules/phase-10-rc1.md) | ✅ Selesai |
-| Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | ⬜ Belum |
-| Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | ⬜ Belum |
+| Phase 11 — Flash USB dan uji hardware | [`modules/phase-11-usb-hardware.md`](modules/phase-11-usb-hardware.md) | 🟡 Sebagian (boot ASUS Vivobook OK; uji perangkat kedua menyusul) |
+| Phase 12 — Perbaikan bug, ISO v2, freeze | [`modules/phase-12-freeze.md`](modules/phase-12-freeze.md) | 🟡 Berjalan (fix touchpad + paket hardware siap, menunggu rebuild) |
 | Phase 13 — Laporan, panduan, demo | [`modules/phase-13-laporan.md`](modules/phase-13-laporan.md) | ⬜ Belum |
 | Lampiran A, B, D, E, F | [`modules/lampiran-01-referensi.md`](modules/lampiran-01-referensi.md) | — |
 | Lampiran C — Struktur akhir repo | [`modules/lampiran-02-struktur-repo.md`](modules/lampiran-02-struktur-repo.md) | — |
@@ -65,6 +65,6 @@ Folder Windows dan folder build di VM (`~/spider-os-build`) sekarang terpisah. B
 
 - Prosedur dan konfigurasi: file-file phase di `modules/`.
 - Palet warna: `tools/spider-sense/src/render/ansi.rs` → [`desain.md`](desain.md).
-- Catatan progres dan screenshot: [`catatan.md`](catatan.md), `screenshots/`.
+- Catatan progres, screenshot, dan daftar bug (termasuk status perbaikan): [`catatan.md`](catatan.md), `screenshots/`.
 
 

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=SpiderOS Touchpad Tap
+Comment=Aktifkan tap-to-click pada touchpad libinput
+Exec=/bin/sh /usr/local/bin/spideros-touchpad-tap
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=XFCE;
