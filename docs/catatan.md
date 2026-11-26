@@ -28,7 +28,7 @@ Format tiap entri: tanggal, phase, apa yang dilakukan, command, hasil.
 | 2026-11-24 | Dokumentasi | Catat hasil uji Phase 10 ke tabel di bawah; perbedaan BIOS/UEFI tidak dijadikan kriteria (auto-boot by design) | edit `docs/catatan.md`, `docs/index.md` | Phase 1–10 ditandai selesai; item yang belum sempat diuji ditandai jujur |
 | 2026-11-24 | Phase 9.5/9.6 | Audit akhir: ternyata Phase 9.5/9.6 hanya ada di doc. Buat package list `content.list.chroot` + `games.list.chroot`, 3 desktop entry, folder komik + README | `write` file baru di `config/` | File siap; perlu rebuild sekali lagi supaya masuk ISO |
 | 2026-11-26 | Phase 11 | Verifikasi ISO, flash USB 8 GB (SanDisk Cruzer Blade) dengan Rufus 4.16 mode DD, lalu uji boot di laptop ASUS Vivobook | `Get-FileHash` (8eac0f45…5a74ca cocok), Rufus START → DD Image mode, boot menu → Live system | Boot live system **berhasil**. Bug: tap-to-click touchpad mati, harus klik fisik (dicatat B01) |
-| 2026-11-26 | Phase 12 | Siapkan perbaikan bug B01 + pencegahan bug hardware lain: konfigurasi libinput tap-to-click + autostart, package list hardware (firmware SOF/Intel audio, MediaTek, Bluetooth, storage, power, VA-API) | `write` file baru di `config/`; tabel bug masuk `docs/catatan.md` §12.1; edit `docs/index.md`, `docs/modules/phase-11-usb-hardware.md` | File siap; **belum di-build**. Langkah berikutnya: rebuild `./scripts/build.sh v1.0` di VM lalu uji ulang di ASUS |
+| 2026-11-26 | Phase 12 | Siapkan perbaikan bug B01 + B03 + pencegahan bug hardware: konfigurasi libinput tap-to-click + autostart, DPI 120 untuk layar HiDPI, package list hardware (firmware SOF/Intel audio, MediaTek, Bluetooth + modul audio, storage, power, VA-API) | `write`/edit file di `config/`; tabel bug masuk `docs/catatan.md` §12.1; edit `docs/index.md`, `docs/modules/phase-11-usb-hardware.md`, `docs/modules/phase-12-freeze.md` | File siap; **belum di-build**. Langkah berikutnya: rebuild `./scripts/build.sh v1.0` di VM lalu uji ulang di ASUS |
 
 ### 10.2 Hasil uji Phase 10
 
@@ -68,6 +68,7 @@ Ditemukan bug selama Phase 10–12. Urutan prioritas: (1) tidak bisa boot, (2) t
 |---|---|---|---|---|---|
 | B01 | Phase 11 — ASUS Vivobook | Tap-to-click touchpad tidak berfungsi; harus menekan tombol fisik di bawah touchpad | libinput default `Tapping=0` di Debian/XFCE | `config/includes.chroot_after_packages/etc/X11/xorg.conf.d/40-libinput-touchpad.conf` + autostart `spideros-touchpad-tap` | Diperbaiki, menunggu uji ISO baru |
 | B02 | Phase 12 — dokumentasi | Checksum di `docs/catatan.md` (`559c65…2504`) tidak cocok dengan ISO final di `dist/` (`8eac0f45…5a74ca`) | ISO dibangun ulang setelah entri catatan lama dibuat | Samakan checksum di catatan/release notes setelah build final | Terbuka |
+| B03 | Phase 11 — ASUS Vivobook | Teks dan ikon terasa kecil di layar HiDPI (tajam, tetapi ukurannya mungil) | XFCE memakai 96 DPI, sedangkan Windows memakai 125–150% | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml` → `Xft/DPI = 120` | Diperbaiki, menunggu uji ISO baru |
 
 Catatan:
 

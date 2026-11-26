@@ -2248,7 +2248,8 @@ Bug temuan Phase 11 sudah masuk [`docs/catatan.md`](../catatan.md) §12.1. Perub
 |---|---|---|
 | B01 tap-to-click mati | `config/includes.chroot_after_packages/etc/X11/xorg.conf.d/40-libinput-touchpad.conf` | `Option "Tapping" "on"` untuk semua touchpad libinput |
 | B01 (fallback) | `config/includes.chroot_after_packages/usr/local/bin/spideros-touchpad-tap` + `etc/xdg/autostart/spideros-touchpad.desktop` | Aktifkan tapping via `xinput` saat sesi XFCE mulai |
-| Pencegahan bug hardware | `config/package-lists/hardware.list.chroot` | Firmware SOF/Intel audio, MediaTek, Cirrus, NVIDIA; `alsa-ucm-conf`; `bluez`; `udisks2`, `exfatprogs`, `ntfs-3g`; `upower`, `thermald`, `brightnessctl`; VA-API; alat diagnostik |
+| B03 DPI terlalu kecil | `config/includes.chroot_after_packages/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml` | `Xft/DPI = 120` (125%) untuk layar HiDPI |
+| Pencegahan bug hardware | `config/package-lists/hardware.list.chroot` | Firmware SOF/Intel audio, MediaTek, Cirrus, NVIDIA; `alsa-ucm-conf`; `bluez` + `pulseaudio-module-bluetooth`; `udisks2`, `exfatprogs`, `ntfs-3g`; `upower`, `thermald`, `brightnessctl`; VA-API; alat diagnostik |
 
 Setelah build, uji ulang B01 dan fungsi hardware lain di ASUS Vivobook, lalu perbarui matriks 11.8.
 

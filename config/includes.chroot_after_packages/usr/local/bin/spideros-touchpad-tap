@@ -2,6 +2,8 @@
 # Fallback: pastikan tap-to-click aktif untuk semua touchpad libinput.
 # Dijalankan otomatis saat sesi XFCE mulai (lihat spideros-touchpad.desktop),
 # untuk berjaga-jaga bila xfsettingsd menimpa konfigurasi Xorg.
+# Beri jeda singkat agar xfsettingsd selesai menerapkan setelannya lebih dulu.
+sleep 2
 xinput list --name-only 2>/dev/null | while IFS= read -r dev; do
     xinput set-prop "$dev" "libinput Tapping Enabled" 1 >/dev/null 2>&1 || true
     xinput set-prop "$dev" "libinput Tapping Drag Enabled" 1 >/dev/null 2>&1 || true

@@ -22,6 +22,7 @@ wireless-regdb
 bluez
 bluetooth
 blueman
+pulseaudio-module-bluetooth
 rfkill
 iw
 
