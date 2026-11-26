@@ -24,8 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     container:
-      # Harus Debian trixie (sama dengan target) dan privileged agar
-      # live-build bisa mount/losetup/mknod saat membuat squashfs + ISO.
       image: debian:trixie
       options: --privileged
 
